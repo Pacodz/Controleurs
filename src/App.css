@@ -1,0 +1,75 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hoverable {
+  transition: background-color 0.3s;
+}
+
+.hoverable:hover {
+  background-color: lightblue;
+}
+
+.td-btn {
+  display: 'block';
+  height: '100%';
+  width: '100%';
+  color: 'inherit';
+  padding: '8px';
+  text-decoration: none;
+}
+
+.custom-checkbox {
+  transform: scale(2.0); /* Ajuste la taille */
+  margin: 10px;
+}
+
+.btn-welcome{
+  display: block;
+  height: 90%;
+  width: 90%;
+}
+
+.td-welcome {
+
+  height: 150px;
+
+}
+
+
+
