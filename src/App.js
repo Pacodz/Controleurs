@@ -4,7 +4,6 @@ import './App.css';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
 
-import NavbarApp from './Components/Navbar';
 import ArriveeInternationale from './Components/ArriveeInternationale';
 import ArriveeNationale from './Components/ArriveeNationale';
 import DepartNational from './Components/DepartNational';
@@ -15,9 +14,8 @@ import Welcome from './Components/Welcome';
 import LoginPage from './Components/LoginPage';
 
 
-import { useAuth } from './Components/AuthContext';
 import ProtectedRoute from './Components/ProtectedRoute';
-
+import Formtest from './Components/formtest';
 
 function App() {
 
@@ -41,7 +39,7 @@ function App() {
   return (
 
     <div className="App">
-
+<Formtest></Formtest>
 
       <Routes>
         
