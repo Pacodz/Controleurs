@@ -7,10 +7,30 @@ const Formtest = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const newItems = [];
+
     const [items, setItems] = useState([]); // Liste dynamique d'items
     const [newItemName, setNewItemName] = useState(""); // Nom pour un nouvel item
 
+
+    useEffect(() => {
+        if (JSON.stringify(items) !== JSON.stringify(newItems)) { setItems(newItems) }
+        console.log(items)
+
+        return () => {
+
+
+        }
+    }, [newItems])
+
+
     // Ajout d'un nouvel item
+
+    const addItem = (item) => {
+        const newItem = { id: item.id, name: item.Nom, conforme: true }; // Création d'un item unique
+        newItems.push(newItem)
+    }
+
     const handleAddItem = () => {
         if (newItemName.trim() === "") return;
         const newItem = { id: Date.now(), name: newItemName }; // Création d'un item unique
@@ -25,12 +45,21 @@ const Formtest = () => {
 
 
     const handleChange = (event) => {
-        console.log(event.target.name);
-        console.log(event.target.checked)
-        console.log(event.target.value)
+
+
+        console.log("Intervention " + event.target.name + " : " + event.target.value)
     };
 
 
+    const handleWrite = (event) => {
+
+
+        console.log("Description " + event.target.name + " : " + event.target.value)
+    }
+
+    const handleCheked = (event) => {
+        console.log("Conformité " + event.target.name + " : " + event.target.value)
+    }
 
 
     useEffect(() => {
@@ -105,25 +134,32 @@ const Formtest = () => {
                         data.map((item) => (
 
                             item.A_I === 1 && (
+
+
+
+
                                 <tr key={item.id}>
+
+                                    {addItem(item)}
+
                                     <td>{item.Nom}</td>
                                     <td>
                                         <Form.Check className='custom-checkbox'
-                                          name={item.Nom+' Conforme'}
-                                          onChange={handleChange}
+                                            name={item.Nom + ' Conforme'}
+                                            onChange={handleCheked}
                                         ></Form.Check>
                                     </td>
                                     <td>
-                                        <Form.Control as='textarea' rows={3} placeholder="Décrire le problème " 
-                                                name={item.Nom+' Description'}
-                                                onChange={handleChange} />
+                                        <Form.Control as='textarea' rows={3} placeholder="Décrire le problème "
+                                            name={item.Nom + ' Description'}
+                                            onChange={handleWrite} />
 
                                     </td>
                                     <td>
 
                                         <Form.Group>
                                             <Form.Check
-                                                name={item.Nom+' Intervention'}
+                                                name={item.Nom + ' Intervention'}
                                                 type="radio"
                                                 label="Oui"
                                                 value="Oui"
@@ -132,7 +168,7 @@ const Formtest = () => {
                                             />
 
                                             <Form.Check
-                                                name={item.Nom+' Intervention'}
+                                                name={item.Nom + ' Intervention'}
                                                 type="radio"
                                                 label="Non"
                                                 value="Non"
