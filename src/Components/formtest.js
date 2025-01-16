@@ -14,55 +14,6 @@ const Formtest = () => {
 
 
     useEffect(() => {
-        if (JSON.stringify(items) !== JSON.stringify(newItems)) { setItems(newItems) }
-        console.log(items)
-
-        return () => {
-
-
-        }
-    }, [newItems])
-
-
-    // Ajout d'un nouvel item
-
-    const addItem = (item) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: true }; // Création d'un item unique
-        newItems.push(newItem)
-    }
-
-    const handleAddItem = () => {
-        if (newItemName.trim() === "") return;
-        const newItem = { id: Date.now(), name: newItemName }; // Création d'un item unique
-        setItems([...items, newItem]); // Ajout à la liste
-        setNewItemName(""); // Réinitialisation du champ
-    };
-
-    // Suppression d'un item
-    const handleDeleteItem = (id) => {
-        setItems(items.filter((item) => item.id !== id));
-    };
-
-
-    const handleChange = (event) => {
-
-
-        console.log("Intervention " + event.target.name + " : " + event.target.value)
-    };
-
-
-    const handleWrite = (event) => {
-
-
-        console.log("Description " + event.target.name + " : " + event.target.value)
-    }
-
-    const handleCheked = (event) => {
-        console.log("Conformité " + event.target.name + " : " + event.target.value)
-    }
-
-
-    useEffect(() => {
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3002/api/data');
@@ -76,6 +27,64 @@ const Formtest = () => {
 
         fetchData();
     }, []);
+
+    useEffect(() => {
+        if (JSON.stringify(items) !== JSON.stringify(newItems)) {
+            setItems(newItems)
+        }
+
+        console.log(items)
+
+    }, [newItems])
+
+
+    const searchById = (id) => {
+        return items.find((item) => item.id === id);
+    };
+
+    const searchByName = (name) => {
+        return items.find((item) => item.name === name);
+    };
+
+    const handleClick = () => {
+        setLoading(true)
+        setItems(items)
+        setLoading(false)
+      console.log(items)
+    }
+    
+
+    // Ajout d'un nouvel item
+
+    const addItem = (item) => {
+        const newItem = { id: item.id, name: item.Nom, conforme: true, description: "", invervention: false }; // Création d'un item unique
+        newItems.push(newItem)
+    }
+
+
+    const handleCheked = (event) => {
+        console.log("Conformité " + event.target.name + " : " + event.target.checked)
+        const nom = event.target.name
+        const item = searchByName(nom)
+        item.conforme= event.target.checked
+
+    }
+
+    const handleWrite = (event) => {
+        const nom = event.target.name
+        const item = searchByName(nom)
+        item.description=event.target.value
+    }
+
+
+
+    const handleChange = (event) => {
+        const nom = event.target.name
+        const item = searchByName(nom)
+        item.invervention=event.target.value
+
+    };
+
 
     if (loading) {
         return <p>Chargement des données...</p>;
@@ -93,7 +102,6 @@ const Formtest = () => {
                         {/* Remplacez les en-têtes par les colonnes de votre table */}
                         <th>ID</th>
                         <th>Nom</th>
-
                         <th>H_P</th>
                         <th>ERG</th>
                         <th>D_I</th>
@@ -129,7 +137,6 @@ const Formtest = () => {
                 </thead>
 
                 <tbody>
-
                     {
                         data.map((item) => (
 
@@ -138,20 +145,18 @@ const Formtest = () => {
 
 
 
-                                <tr key={item.id}>
-
-                                    {addItem(item)}
-
+                                <tr key={item.id}>        {addItem(item)}
                                     <td>{item.Nom}</td>
                                     <td>
                                         <Form.Check className='custom-checkbox'
-                                            name={item.Nom + ' Conforme'}
+                                            name={item.Nom}
                                             onChange={handleCheked}
                                         ></Form.Check>
                                     </td>
                                     <td>
                                         <Form.Control as='textarea' rows={3} placeholder="Décrire le problème "
-                                            name={item.Nom + ' Description'}
+
+                                            name={item.Nom}
                                             onChange={handleWrite} />
 
                                     </td>
@@ -159,32 +164,32 @@ const Formtest = () => {
 
                                         <Form.Group>
                                             <Form.Check
-                                                name={item.Nom + ' Intervention'}
+                                                name={item.Nom}
                                                 type="radio"
                                                 label="Oui"
-                                                value="Oui"
+                                                value={true}
                                                 onChange={handleChange}
 
                                             />
 
                                             <Form.Check
-                                                name={item.Nom + ' Intervention'}
+                                                name={item.Nom}
                                                 type="radio"
                                                 label="Non"
-                                                value="Non"
+                                                value={false}
                                                 onChange={handleChange}
 
                                             />
                                         </Form.Group>
                                     </td>
-
                                 </tr>
                             )
                         ))}
-
                 </tbody>
 
             </Table>
+
+            <Button onClick={handleClick}>Soumettre</Button>
         </>
 
     );
