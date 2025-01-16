@@ -6,11 +6,8 @@ const Formtest = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const newItems = [];
-
     const [items, setItems] = useState([]); // Liste dynamique d'items
-    const [newItemName, setNewItemName] = useState(""); // Nom pour un nouvel item
 
 
     useEffect(() => {
@@ -37,10 +34,7 @@ const Formtest = () => {
 
     }, [newItems])
 
-
-    const searchById = (id) => {
-        return items.find((item) => item.id === id);
-    };
+    
 
     const searchByName = (name) => {
         return items.find((item) => item.name === name);

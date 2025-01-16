@@ -7,7 +7,6 @@ const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
 
   if (!user) {
-      console.log("hna")
     return <Navigate to="/login" />;
   }
 
