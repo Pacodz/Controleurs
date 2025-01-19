@@ -1,61 +1,86 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import React, { useState } from 'react';
-import { Container, Row, Col, ListGroup, Card } from 'react-bootstrap';
+import React from 'react'
+import { Button, Table, Form, Container, Col, Row, Alert, Spinner } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import NavbarApp from './Navbar'
+import { useAuth } from './AuthContext';
+import { useLocation } from 'react-router-dom';
 
-const reportData = [
-  { id: 1, title: 'Sales Report Q1', author: 'John Doe', date: '2023-01-15', content: 'This report covers sales data for the first quarter.' },
-  { id: 2, title: 'Customer Feedback Report', author: 'Jane Smith', date: '2023-02-10', content: 'This report summarizes customer feedback from the last survey.' },
-  { id: 3, title: 'Inventory Status Report', author: 'Alice Johnson', date: '2023-03-05', content: 'An overview of current inventory levels and shortages.' },
-];
 
-const Dashboard = () => {
-  const [selectedReport, setSelectedReport] = useState(null);
 
-  const handleReportSelection = (report) => {
-    setSelectedReport(report);
-  };
+
+function Dashboard() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Récupérer les données depuis l'API
+  useEffect(() => {
+    axios
+      .get("http://localhost:3002/api/rapports")
+      .then((response) => {
+        setData(response.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des données :", error);
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <Container className="py-4">
-      <Row>
-        <Col md={4}>
-          <h4>Reports List</h4>
-          <ListGroup>
-            {reportData.map((report) => (
-              <ListGroup.Item 
-                key={report.id} 
-                action 
-                onClick={() => handleReportSelection(report)}
-              >
-                <strong>ID:</strong> {report.id} <br />
-                <strong>Title:</strong> {report.title} <br />
-                <strong>Author:</strong> {report.author} <br />
-                <strong>Date:</strong> {report.date}
-              </ListGroup.Item>
+    <div>
+      {loading ? (
+        <Spinner animation="border" />
+      ) : (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Num</th>
+              <th>Date</th>
+              <th>Heure</th>
+              <th>َAuteur</th>
+              <th>Zone</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={item.id}>
+                <td>{item.Num}</td>
+                <td>{item.date.split("T")[0]}</td>
+                <td>{item.date.split("T")[1].split(".")[0].slice(0,5)}</td>
+                <td>{item.nom} {item.prenom}</td>
+                <td>{item.zone}</td>
+                <td>
+                  <Container>
+                    <Row>
+                  <Col>
+                  <Button variant="primary" className='btn-dashboard' onClick={() => alert(`ID: ${item.Num}`)}>
+                    Consulter
+                  </Button>
+                  </Col>
+                  <Col>
+                  <Button variant="dark" className='btn-dashboard' onClick={() => alert(`ID: ${item.Num}`)}>
+                    Marquer comme lu
+                  </Button>
+                  </Col>
+                  <Col>
+                  <Button variant="danger" className='btn-dashboard' onClick={() => alert(`ID: ${item.Num}`)}>
+                    Supprimer
+                  </Button>
+                  </Col>
+               
+                  </Row>
+                  </Container>
+                </td>
+              </tr>
             ))}
-          </ListGroup>
-        </Col>
-        <Col md={8}>
-          <h4>Report Details</h4>
-          {selectedReport ? (
-            <Card>
-              <Card.Header>{selectedReport.title}</Card.Header>
-              <Card.Body>
-                <Card.Text>
-                  <strong>ID:</strong> {selectedReport.id} <br />
-                  <strong>Author:</strong> {selectedReport.author} <br />
-                  <strong>Date:</strong> {selectedReport.date} <br />
-                  <strong>Content:</strong> {selectedReport.content}
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          ) : (
-            <p>Select a report to view details.</p>
-          )}
-        </Col>
-      </Row>
-    </Container>
+          </tbody>
+        </Table>
+      )}
+    </div>
   );
-};
+}
+
 
 export default Dashboard;

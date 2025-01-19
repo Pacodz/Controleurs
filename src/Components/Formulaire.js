@@ -8,6 +8,9 @@ import { useLocation } from 'react-router-dom';
 
 const Formulaire = () => {
 
+    const { user, login, logout } = useAuth();
+
+
     const location = useLocation();
 
     const { zone } = location.state || {};
@@ -82,6 +85,8 @@ const Formulaire = () => {
 
 
     useEffect(() => { // Récupération DB
+        console.log(user.userlig.id)
+
         const fetchData = async () => {
             try {
                 const response = await axios.get('http://localhost:3002/api/data');
@@ -119,7 +124,8 @@ const Formulaire = () => {
         try {
             const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
                 date: new Date(),
-                id_user: 3
+                id_user: user.userlig.id,
+                zone: zone
             });
 
             console.log('Réponse du serveur:', response.data);
