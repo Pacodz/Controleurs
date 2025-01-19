@@ -18,6 +18,68 @@ const Formulaire = () => {
     const newItems = [];
     const [items, setItems] = useState([]); // Liste dynamique d'items
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleConfirm = () => {
+        closeModal();
+        alert('Action confirmée !');
+        handleClick();
+        // Vous pouvez ajouter ici le code pour effectuer l'action
+    };
+
+    const modalStyles = {
+        overlay: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+        },
+        content: {
+            backgroundColor: '#fff',
+            padding: '20px',
+            borderRadius: '8px',
+            textAlign: 'center',
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+            maxWidth: '400px',
+            width: '90%',
+        },
+        buttons: {
+            marginTop: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+        },
+        confirmButton: {
+            padding: '10px 20px',
+            backgroundColor: '#4CAF50',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+        },
+        cancelButton: {
+            padding: '10px 20px',
+            backgroundColor: '#f44336',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+        },
+    };
+    
+
+
 
     useEffect(() => { // Récupération DB
         const fetchData = async () => {
@@ -48,30 +110,63 @@ const Formulaire = () => {
         return items.find((item) => item.name === name);
     };
 
-    const handleClick = async (e) => {
+    const handleClick = async () => {
+        let idRapport = 0
+
         setLoading(true)
         setItems(items)
-        setLoading(false)
-
+        //création d'un nouveau rapport
         try {
             const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
-              date: new Date(),
-              id_user: 3
+                date: new Date(),
+                id_user: 3
             });
-      
+
             console.log('Réponse du serveur:', response.data);
-          } catch (error) {
+
+            idRapport = response.data.data.insertId
+
+        } catch (error) {
             console.error('Erreur lors de l\'envoi des données:', error);
-          }
-          
-        console.log(items)
+        }
+
+      
+
+        let data1 = []
+
+        items.map((item) => (data1.push([ item.conforme ,  item.description, item.id,  item.intervention, idRapport])))
+
+
+        try {
+            const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
+            alert(response.data.message); // Afficher le message de confirmation
+        } catch (error) {
+            if (error.response) {
+                // Erreur provenant du serveur
+                console.error('Erreur du serveur :', error.response.data.message);
+                alert('Erreur : ' + error.response.data.message);
+            } else if (error.request) {
+                // Pas de réponse du serveur
+                console.error('Pas de réponse du serveur :', error.request);
+                alert('Erreur réseau : pas de réponse du serveur');
+            } else {
+                // Erreur lors de la configuration de la requête
+                console.error('Erreur dans la requête :', error.message);
+                alert('Une erreur est survenue : ' + error.message);
+            }
+        }
+
+        setLoading(false)
+
+
+
     }
 
 
     // Ajout d'un nouvel item
 
     const addItem = (item) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: true, description: "", invervention: false }; // Création d'un item unique
+        const newItem = { id: item.id, name: item.Nom, conforme: true, description: "", intervention: false }; // Création d'un item unique
         newItems.push(newItem)
     }
 
@@ -94,7 +189,7 @@ const Formulaire = () => {
     const handleChange = (event) => {
         const nom = event.target.name
         const item = searchByName(nom)
-        item.invervention = event.target.value
+        item.intervention = event.target.value
 
     };
 
@@ -213,12 +308,28 @@ const Formulaire = () => {
                     </Row>
                     <Row>
                         <Col size='lg'>
-                            <Button size='lg' className='my-3' onClick={handleClick}> <h4 className='mx-3'> Soumettre le Rapport </h4> </Button>
+                            <Button size='lg' className='my-3' onClick={openModal}> <h4 className='mx-3'> Soumettre le Rapport </h4> </Button>
                         </Col>
+
+
                     </Row>
 
                 </Col>
             </Container>
+
+               {/* Modal */}
+               {isModalOpen && (
+                <div style={modalStyles.overlay}>
+                    <div style={modalStyles.content}>
+                        <h2>Confirmation</h2>
+                        <p>Êtes-vous sûr de vouloir soumettre votre rapport ?</p>
+                        <div style={modalStyles.buttons}>
+                            <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
+                            <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </>
 

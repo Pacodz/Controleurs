@@ -3,6 +3,7 @@ import { Container, Row, Col, Form, Button, Card, Alert } from 'react-bootstrap'
 import { useAuth } from './AuthContext';
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { useEffect } from 'react';
 
 
 function LoginPage() {
@@ -11,11 +12,35 @@ function LoginPage() {
   const [error, setError] = useState('');
   const { user, login, logout } = useAuth();
   const navigate = useNavigate(); // Initialise le hook de navigation
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
 
-  const handleForgot = (e) => {
-    return <Navigate to="/Enregistrement" />
 
+  useEffect(() => { // Récupération DB
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3002/api/users');
+        setData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError('Erreur lors de la récupération des données');
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const searchByName = (name) => {
+
+    return data.find((user) => user.username === name);
+  };
+
+  const getPassword = (name) => {
+    const user = searchByName(name) 
+    return user.password
   }
 
   const handleSubmit = (e) => {
@@ -27,9 +52,10 @@ function LoginPage() {
       return;
     }
 
-    if (password === '123') {
+    if (password === getPassword(username)) {
       alert(`Connexion réussie pour : ${username}`);
-      login(username)
+      const userlig = searchByName(username)
+      login(userlig, username)
       console.log(user)
 
     } else {
@@ -37,7 +63,6 @@ function LoginPage() {
       return;
 
     }
-
     // Simulation de connexion
     setError('');
 
@@ -45,6 +70,15 @@ function LoginPage() {
 
     // alert(`Connexion réussie pour : ${username}`);
   };
+
+  if (loading) {
+    return <p>Chargement des données...</p>;
+  }
+
+  // if (error) {
+  //   return <p>{error}</p>;
+  // }
+
 
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
@@ -59,13 +93,16 @@ function LoginPage() {
                 <Form.Group>
                   <Form.Label>Contrôleur</Form.Label>
 
-                  <Form.Control as="select" onChange={(e) => { setUsername(e.target.value) }} className="mb-3" value={username}
+                  <Form.Control as="select" onChange={(e) => {
+                    setUsername(e.target.value)
+                  }} className="mb-3" value={username}
                   >
                     <option value="" disabled>Choisissez un contrôleur</option>
-                    <option>RACHEDI Salah eddine</option>
-                    <option>LEFTAHA Nadjib </option>
-                    <option>RAS EL AIN Mohamed el Amine</option>
-                    <option>BOUDJADA Zine el Abidine</option>
+
+                    {data.map((user) => (
+                      <option>{user.username}</option>
+                    ))}
+
                   </Form.Control>
                 </Form.Group>
                 {/* <Form.Group controlId="formEmail" className="mb-3">

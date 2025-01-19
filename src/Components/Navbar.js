@@ -23,7 +23,7 @@ function NavbarApp() {
 
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">{user.username}</Nav.Link>
+            <Nav.Link href="#deets">{user.userlig.nom+" "+user.userlig.prenom}</Nav.Link>
             <Nav.Link eventKey={2} href="">
 
               {formattedDate}
