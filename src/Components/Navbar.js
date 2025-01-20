@@ -16,6 +16,8 @@ function NavbarApp() {
       <Container>
 
         <Navbar.Brand href="#home">   <Link className='td-btn' to='/welcome'>Retour à la page d'accueil       </Link></Navbar.Brand>
+        <Link className='td-btn' to='/Dashboard'>Tableau de board       </Link>
+       
 
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">

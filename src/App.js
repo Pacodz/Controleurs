@@ -41,10 +41,10 @@ function App() {
         <Route path='/ArriveeNationale' element={<ProtectedRoute><Formulaire /></ProtectedRoute>} />
         <Route path='/ArriveeInternationale' element={<ProtectedRoute><Formulaire /></ProtectedRoute>} />
         <Route path="/welcome" element={<ProtectedRoute><Welcome></Welcome></ProtectedRoute>} />
+        <Route path="/Dashboard" element={<ProtectedRoute><Dashboard></Dashboard></ProtectedRoute>} />      
         <Route path="*" element={<Navigate to='/login'></Navigate>} />
 
       </Routes>
-      <Dashboard></Dashboard>
 
 
 

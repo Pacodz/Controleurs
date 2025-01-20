@@ -80,19 +80,19 @@ app.post('/api/ajouter', (req, res) => {
 
 // Creation nouveau rapport
 app.post('/api/nouveaurapport', (req, res) => {
-    const { date, id_user } = req.body; // Supposons que vous envoyez ces données depuis React
+    const { date, id_user, zone } = req.body; // Supposons que vous envoyez ces données depuis React
 
-    let idReport 
+    let idReport
 
-    const query = 'INSERT INTO rapport (date, id_user) VALUES (?, ?)';
-    db.query(query, [date, id_user], (err, result) => {
+    const query = 'INSERT INTO rapport (date, id_user, zone) VALUES (?, ?, ?)';
+    db.query(query, [date, id_user, zone], (err, result) => {
         if (err) {
             res.status(500).send({ message: 'Erreur lors de la création du rapport' });
         } else {
             res.status(200).send({ message: 'Rapport créé avec succès', data: result });
         }
 
-        idReport=result.insertId
+        idReport = result.insertId
     });
 
 
@@ -114,7 +114,7 @@ app.post('/api/nouveaurapport', (req, res) => {
 // Route pour l'insertion multiple
 app.post('/api/insererElements', async (req, res) => {
     const { data1 } = req.body; // Les données envoyées depuis le frontend
-   
+
     if (!Array.isArray(data1) || data1.length === 0) {
         return res.status(400).json({ message: 'Aucune donnée fournie' });
     }
@@ -128,7 +128,7 @@ app.post('/api/insererElements', async (req, res) => {
         const query = `INSERT INTO control (conforme, detail, id_elements, intervention, id_rapport) VALUES ${placeholders}`;
         // Exécuter la requête
         db.query(query, values);
-        
+
         res.status(200).json({ message: 'Données insérées avec succès' });
     } catch (error) {
         console.error(error);
@@ -137,4 +137,60 @@ app.post('/api/insererElements', async (req, res) => {
 });
 
 
+// chargement rapports
 
+
+app.get('/api/rapports', (req, res) => {
+    const query = 'SELECT rapport.id AS Num, date, nom, prenom, zone FROM rapport inner JOIN users ON users.id=rapport.id_user;' // Remplacez par votre table
+
+    db.query(query, (err, results) => {
+        if (err) {
+            console.error('Erreur lors de l\'exécution de la requête:', err);
+            res.status(500).json({ error: 'Erreur du serveur' });
+            return;
+        }
+        res.status(200).json(results);
+    });
+});
+
+// suppriession rapport
+
+app.delete('/delete/:num', (req, res) => {
+    const id = req.params.num;
+    const query = 'DELETE FROM rapport WHERE id = ?';
+    const query2 = 'DELETE FROM control WHERE id_rapport = ?';
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+    });
+
+    db.query(query2, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: 'Data deleted successfully!', result });
+    });
+
+
+
+});
+
+
+// Chargement rapport
+
+app.get('/api/rapport/:currentReport', (req, res) => {
+    const id = req.params.currentReport;
+    const query = 'SELECT Nom AS élements, Conforme, detail, photo, intervention  FROM control INNER JOIN elements ON control.id_elements=elements.id WHERE control.id_rapport=?'
+
+    db.query(query, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ message: 'Données du rapport chargés!', result });
+    });
+
+
+
+});
