@@ -10,18 +10,18 @@ const Formulaire = () => {
 
     const { user, login, logout } = useAuth();
 
-
     const location = useLocation();
-
     const { zone } = location.state || {};
-
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const newItems = [];
     const [items, setItems] = useState([]); // Liste dynamique d'items
-
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [loaded, setLoaded] = useState(false)
+
+
     const openModal = () => {
         setIsModalOpen(true);
     };
@@ -80,8 +80,6 @@ const Formulaire = () => {
             cursor: 'pointer',
         },
     };
-    
-
 
 
     useEffect(() => { // Récupération DB
@@ -99,15 +97,23 @@ const Formulaire = () => {
         };
 
         fetchData();
+
+
+
+
     }, []);
 
-    useEffect(() => { // Mise à jour state items
+
+    useEffect(() => { // Mise à jour state items+
+
+
         if (JSON.stringify(items) !== JSON.stringify(newItems)) {
             setItems(newItems)
         }
 
 
-    }, [newItems])
+
+    }, [items])
 
 
 
@@ -119,7 +125,9 @@ const Formulaire = () => {
         let idRapport = 0
 
         setLoading(true)
-        setItems(items)
+        console.log(items)
+
+
         //création d'un nouveau rapport
         try {
             const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
@@ -136,11 +144,11 @@ const Formulaire = () => {
             console.error('Erreur lors de l\'envoi des données:', error);
         }
 
-      
+
 
         let data1 = []
 
-        items.map((item) => (data1.push([ item.conforme ,  item.description, item.id,  item.intervention, idRapport])))
+        items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
 
 
         try {
@@ -171,8 +179,8 @@ const Formulaire = () => {
 
     // Ajout d'un nouvel item
 
-    const addItem = (item) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: true, description: "", intervention: false }; // Création d'un item unique
+    const addItem = (item, description, intervention) => {
+        const newItem = { id: item.id, name: item.Nom, conforme: true, description: description, intervention: intervention }; // Création d'un item unique
         newItems.push(newItem)
     }
 
@@ -185,8 +193,11 @@ const Formulaire = () => {
     }
 
     const handleWrite = (event) => {
+
         const nom = event.target.name
+        console.log(nom)
         const item = searchByName(nom)
+        console.log(item)
         item.description = event.target.value
     }
 
@@ -238,10 +249,6 @@ const Formulaire = () => {
         return <p>{error}</p>;
     }
 
-
-
-
-
     return (
 
 
@@ -266,48 +273,48 @@ const Formulaire = () => {
                             </thead>
 
                             <tbody>
-                                {
-                                    data.map((item) => (
+                                {data.map((item) => (
+                                    item[zone] === 1 && (
 
-                                        item[zone] === 1 && (
+                                        <tr key={item.id}>
+                                           
+                                            <td>{item.Nom}</td>
+                                            <td>
+                                                <Form.Check className='custom-checkbox'
+                                                    name={item.Nom}
+                                                    onChange={handleCheked}
+                                                ></Form.Check>
+                                            </td>
+                                            <td>
+                                                <Form.Control as='textarea' rows={3} placeholder="Décrire le problème "
+                                                    name={item.Nom}
+                                                    onChange={handleWrite} />
+                                            </td>
+                                            <td>
 
-                                            <tr key={item.id}>        {addItem(item)}
-                                                <td>{item.Nom}</td>
-                                                <td>
-                                                    <Form.Check className='custom-checkbox'
+                                                <Form.Group>
+                                                    <Form.Check
                                                         name={item.Nom}
-                                                        onChange={handleCheked}
-                                                    ></Form.Check>
-                                                </td>
-                                                <td>
-                                                    <Form.Control as='textarea' rows={3} placeholder="Décrire le problème "
-
+                                                        type="radio"
+                                                        label="Oui"
+                                                        value={true}
+                                                        onChange={handleChange}
+                                                    />
+                                                    <Form.Check
                                                         name={item.Nom}
-                                                        onChange={handleWrite} />
-
-                                                </td>
-                                                <td>
-
-                                                    <Form.Group>
-                                                        <Form.Check
-                                                            name={item.Nom}
-                                                            type="radio"
-                                                            label="Oui"
-                                                            value={true}
-                                                            onChange={handleChange}
-                                                        />
-                                                        <Form.Check
-                                                            name={item.Nom}
-                                                            type="radio"
-                                                            label="Non"
-                                                            value={false}
-                                                            onChange={handleChange}
-                                                        />
-                                                    </Form.Group>
-                                                </td>
-                                            </tr>
-                                        )
-                                    ))}
+                                                        type="radio"
+                                                        label="Non"
+                                                        value={false}
+                                                        onChange={handleChange}
+                                                    />
+                                                </Form.Group>
+                                            </td>
+                                            {
+                                                addItem(item, '', false)
+                                            }
+                                        </tr>
+                                    )
+                                ))}
                             </tbody>
 
                         </Table>
@@ -323,19 +330,29 @@ const Formulaire = () => {
                 </Col>
             </Container>
 
-               {/* Modal */}
-               {isModalOpen && (
-                <div style={modalStyles.overlay}>
-                    <div style={modalStyles.content}>
-                        <h2>Confirmation</h2>
-                        <p>Êtes-vous sûr de vouloir soumettre votre rapport ?</p>
-                        <div style={modalStyles.buttons}>
-                            <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
-                            <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
+            {/* Modal */}
+            {
+                isModalOpen
+                &&
+                (
+
+                    <div style={modalStyles.overlay}>
+
+                        <div style={modalStyles.content}>
+
+                            <h2>Confirmation</h2>
+
+                            <p>Êtes-vous sûr de vouloir soumettre votre rapport ?</p>
+
+                            <div style={modalStyles.buttons}>
+                                <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
+                                <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
+                            </div>
                         </div>
+
                     </div>
-                </div>
-            )}
+                )
+            }
 
         </>
 

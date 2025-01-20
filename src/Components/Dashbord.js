@@ -33,7 +33,7 @@ const Dashboard = () => {
 
   const openReport = (i) => {
     setCurrentReport(i)
-    setIsReportOpen(true)
+    handleConsult(i)
 
   }
 
@@ -115,34 +115,42 @@ const Dashboard = () => {
       });
   }, []);
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3002/api/rapport/${currentReport}`)
-      .then((response) => {
-        setReportData(response.data);
 
-        setLoading(false);
-        console.log(reportData)
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération des données :", error);
-        setLoading(false);
-      });
-  }, [currentReport]);
 
   //Supprimer un rapport
   const handleDelete = (num) => {
     axios
       .delete(`http://localhost:3002/delete/${num}`)
       .then((response) => {
-        console.log(response.data.message);
         setData(data.filter((item) => item.Num !== num));        // Mise à jour locale
       })
       .catch((error) => console.error(error));
   }
 
+  const handleConsult = (currentReport) => {
+
+    axios
+      .get(`http://localhost:3002/api/rapport/${currentReport}`)
+      .then((response) => {
+
+
+        setReportData(response.data.result);
+
+        setTimeout(() => {
+
+        }, 5000);
+
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des données :", error);
+      });
+
+    setIsReportOpen(true)
+
+  }
+
+
   const endroit = (zone) => {
-    console.log(zone)
     switch (zone) {
       case 'A_I':
         return <p>Arrivée Internationale</p>;
@@ -242,7 +250,7 @@ const Dashboard = () => {
           )}
 
           {/* Rapport */}
-          {isReportOpen && (
+          {(isReportOpen && reportData) && (
             <div style={modalStyles.overlay}>
               <div style={modalStyles.content2}>
                 <h2>Rapport</h2>
@@ -258,8 +266,8 @@ const Dashboard = () => {
 
 
                   <tbody>
-                    {reportData.result.map((item, index) => (
-                      <tr>
+                    {reportData.map((item) => (
+                      <tr key={item.élements}>
                         <td>{item.élements}</td>
                         <td>{item.Conforme}</td>
                         <td>{item.detail}</td>
