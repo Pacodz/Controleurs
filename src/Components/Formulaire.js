@@ -23,16 +23,81 @@ const Formulaire = () => {
 
 
     const openModal = () => {
+        console.log("clique boutton")
+        addItems()
         setIsModalOpen(true);
     };
     const closeModal = () => {
         setIsModalOpen(false);
     };
 
-    const handleConfirm = () => {
-        closeModal();
+    const handleConfirm = async () => {
+        console.log("modal confirmé")
+
+
+            let idRapport = 0
+
+            console.log("Création d'un nouveau rapport")
+
+            console.log(items)
+            console.log(newItems)
+
+            // setLoading(true)
+
+
+
+            //création d'un nouveau rapport
+            try {
+                const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
+                    date: new Date(),
+                    id_user: user.userlig.id,
+                    zone: zone
+                });
+
+                console.log('Réponse du serveur:', response.data);
+
+                idRapport = response.data.data.insertId
+
+            } catch (error) {
+                console.error('Erreur lors de l\'envoi des données:', error);
+            }
+
+
+
+            let data1 = []
+
+            items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
+
+            console.log(data1)
+
+            try {
+                const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
+                // alert(response.data.message); // Afficher le message de confirmation
+            } catch (error) {
+                if (error.response) {
+                    // Erreur provenant du serveur
+                    console.error('Erreur du serveur :', error.response.data.message);
+                    alert('Erreur : ' + error.response.data.message);
+                } else if (error.request) {
+                    // Pas de réponse du serveur
+                    console.error('Pas de réponse du serveur :', error.request);
+                    alert('Erreur réseau : pas de réponse du serveur');
+                } else {
+                    // Erreur lors de la configuration de la requête
+                    console.error('Erreur dans la requête :', error.message);
+                    alert('Une erreur est survenue : ' + error.message);
+                }
+            }
+
+            // setLoading(false)
+
+
+
+        
         alert('Action confirmée !');
-        handleClick();
+
+        closeModal();
+
         // Vous pouvez ajouter ici le code pour effectuer l'action
     };
 
@@ -83,6 +148,8 @@ const Formulaire = () => {
 
 
     useEffect(() => { // Récupération DB
+        setLoading(true)
+
         console.log(user.userlig.id)
 
         const fetchData = async () => {
@@ -98,83 +165,48 @@ const Formulaire = () => {
 
         fetchData();
 
+        console.log("montage composant")
 
 
 
     }, []);
 
+    const [firstItem, setfirstItem] = useState([])
 
-    useEffect(() => { // Mise à jour state items+
-
-
-        if (JSON.stringify(items) !== JSON.stringify(newItems)) {
-            setItems(newItems)
-        }
+    // useEffect(() => { // Mise à jour state items+
 
 
+    //     if (newItems.length !== 0) {
+    //         console.log(JSON.stringify(newItems))
+    //     }
 
-    }, [items])
+    //     if (JSON.stringify(items) !== JSON.stringify(newItems)) {
+    //         if (newItems.length !== 0) {
+    //             console.log(JSON.stringify(newItems))
+    //             setItems(newItems)
+    //         }
+
+    //     }
+
+    //     console.log("changement Items")
+
+
+    // }, [newItems])
+
+    useEffect(() => {
+        console.log("rendu")
+
+
+    })
 
 
 
     const searchByName = (name) => {
-        return items.find((item) => item.name === name);
+        console.log(items)
+        console.log(newItems)
+        return newItems.find((item) => item.name === name);
     };
 
-    const handleClick = async () => {
-        let idRapport = 0
-
-        setLoading(true)
-        console.log(items)
-
-
-        //création d'un nouveau rapport
-        try {
-            const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
-                date: new Date(),
-                id_user: user.userlig.id,
-                zone: zone
-            });
-
-            console.log('Réponse du serveur:', response.data);
-
-            idRapport = response.data.data.insertId
-
-        } catch (error) {
-            console.error('Erreur lors de l\'envoi des données:', error);
-        }
-
-
-
-        let data1 = []
-
-        items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
-
-
-        try {
-            const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
-            alert(response.data.message); // Afficher le message de confirmation
-        } catch (error) {
-            if (error.response) {
-                // Erreur provenant du serveur
-                console.error('Erreur du serveur :', error.response.data.message);
-                alert('Erreur : ' + error.response.data.message);
-            } else if (error.request) {
-                // Pas de réponse du serveur
-                console.error('Pas de réponse du serveur :', error.request);
-                alert('Erreur réseau : pas de réponse du serveur');
-            } else {
-                // Erreur lors de la configuration de la requête
-                console.error('Erreur dans la requête :', error.message);
-                alert('Une erreur est survenue : ' + error.message);
-            }
-        }
-
-        setLoading(false)
-
-
-
-    }
 
 
     // Ajout d'un nouvel item
@@ -182,6 +214,12 @@ const Formulaire = () => {
     const addItem = (item, description, intervention) => {
         const newItem = { id: item.id, name: item.Nom, conforme: true, description: description, intervention: intervention }; // Création d'un item unique
         newItems.push(newItem)
+
+    }
+
+    const addItems = () => {
+
+        setItems(newItems)
     }
 
 
@@ -192,8 +230,8 @@ const Formulaire = () => {
 
     }
 
-    const handleWrite = (event) => {
 
+    const handleWrite = (event) => {
         const nom = event.target.name
         console.log(nom)
         const item = searchByName(nom)
@@ -206,7 +244,8 @@ const Formulaire = () => {
     const handleChange = (event) => {
         const nom = event.target.name
         const item = searchByName(nom)
-        item.intervention = event.target.value
+        item.intervention = event.target.value === 'true' ? event.target.checked : !event.target.checked
+        item.intervention = event.target.value === 'false' ? !event.target.checked : event.target.checked
 
     };
 
@@ -277,7 +316,8 @@ const Formulaire = () => {
                                     item[zone] === 1 && (
 
                                         <tr key={item.id}>
-                                           
+
+
                                             <td>{item.Nom}</td>
                                             <td>
                                                 <Form.Check className='custom-checkbox'
@@ -309,6 +349,7 @@ const Formulaire = () => {
                                                     />
                                                 </Form.Group>
                                             </td>
+
                                             {
                                                 addItem(item, '', false)
                                             }
@@ -316,7 +357,6 @@ const Formulaire = () => {
                                     )
                                 ))}
                             </tbody>
-
                         </Table>
                     </Row>
                     <Row>
