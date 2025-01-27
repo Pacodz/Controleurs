@@ -11,10 +11,14 @@ import { useLocation } from 'react-router-dom';
 
 const Dashboard = () => {
   const [data, setData] = useState([]);
+
   const [reportData, setReportData] = useState([])
+
   const [loading, setLoading] = useState(true);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
+
   const [currentReport, setCurrentReport] = useState('')
 
   const handleConfirm = (params) => {
@@ -74,8 +78,12 @@ const Dashboard = () => {
       borderRadius: '8px',
       textAlign: 'center',
       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      maxWidth: '80%',
+      maxWidth: '90%',
       width: '90%',
+      maxHeight: '90%',
+      height: '90%',
+      overflowY: 'auto',
+      overflowX: 'auto' 
     },
     buttons: {
       marginTop: '20px',
@@ -103,9 +111,14 @@ const Dashboard = () => {
 
   // Récupérer les données depuis l'API
   useEffect(() => {
+    console.log("salut")
+
+    setLoading(true)
+
     axios
-      .get("http://localhost:3002/api/rapports")
+      .get(`https://egsa-constantine.dz/api/rapports?timestamp=${new Date().getTime()}`)
       .then((response) => {
+        console.log(response.data)
         setData(response.data);
         setLoading(false);
       })
@@ -120,7 +133,7 @@ const Dashboard = () => {
   //Supprimer un rapport
   const handleDelete = (num) => {
     axios
-      .delete(`http://localhost:3002/api/delete/${num}`)
+      .delete(`https://egsa-constantine.dz/api/delete/${num}`)
       .then((response) => {
         console.log(response)
         setData(data.filter((item) => item.Num !== num));        // Mise à jour locale
@@ -131,7 +144,7 @@ const Dashboard = () => {
   const handleConsult = (currentReport) => {
 
     axios
-      .get(`http://localhost:3002/api/rapport/${currentReport}`)
+      .get(`https://egsa-constantine.dz/api/rapport/${currentReport}?timestamp=${new Date().getTime()}`)
       .then((response) => {
 
         console.log(response.data.rows)
@@ -190,7 +203,7 @@ const Dashboard = () => {
       ) : (
         <>        <h1 className='my-2'>Liste des rapports</h1>
 
-          <Table striped bordered hover>
+          <Table responsive striped bordered hover>
             <thead>
               <tr>
                 <th>Num</th>
@@ -256,7 +269,7 @@ const Dashboard = () => {
             <div style={modalStyles.overlay}>
               <div style={modalStyles.content2}>
                 <h2>Rapport</h2>
-                <Table striped bordered hover>
+                <Table responsive striped bordered hover>
                   <thead>
                     <tr>
                       <th>Objets à controler</th>

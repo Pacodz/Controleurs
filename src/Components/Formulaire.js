@@ -36,7 +36,7 @@ const Formulaire = () => {
         //création d'un nouveau rapport
         try {
 
-            const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
+            const response = await axios.post('https://egsa-constantine.dz/api/nouveaurapport', {
                 date: new Date(),
                 id_user: user.userlig.id,
                 zone: zone
@@ -59,7 +59,7 @@ const Formulaire = () => {
         items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
 
         try {
-            const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
+            const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 });
             // alert(response.data.message); // Afficher le message de confirmation
         } catch (error) {
             if (error.response) {
@@ -139,7 +139,7 @@ const Formulaire = () => {
 
         const fetchData = async () => {
             try {
-                const response = await axios.get('http://localhost:3002/api/data');
+                const response = await axios.get(`https://egsa-constantine.dz/api/data?timestamp=${new Date().getTime()}`);
                 setData(response.data);
                 setLoading(false);
             } catch (err) {

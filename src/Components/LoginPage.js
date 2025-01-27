@@ -21,7 +21,7 @@ function LoginPage() {
 
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3002/api/users');
+        const response = await axios.get(`https://egsa-constantine.dz/api/users?timestamp=${new Date().getTime()}`);
         setData(response.data);
         setLoading(false);
       } catch (err) {
@@ -57,7 +57,7 @@ function LoginPage() {
       alert(`Connexion réussie pour : ${username}`);
       const userlig = searchByName(username)
       login(userlig, username)
-      console.log(user)
+      console.log(username)
 
     } else {
       setError('Mot de passe Incorrect');
