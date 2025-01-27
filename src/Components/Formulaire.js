@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Formulaire = () => {
 
     const { user, login, logout } = useAuth();
-
+    const navigate = useNavigate();
     const location = useLocation();
     const { zone } = location.state || {};
     const [data, setData] = useState([]);
@@ -18,87 +18,73 @@ const Formulaire = () => {
     const newItems = [];
     const [items, setItems] = useState([]); // Liste dynamique d'items
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     const [loaded, setLoaded] = useState(false)
 
-
     const openModal = () => {
-        console.log("clique boutton")
         addItems()
         setIsModalOpen(true);
     };
+
     const closeModal = () => {
         setIsModalOpen(false);
     };
 
     const handleConfirm = async () => {
-        console.log("modal confirmé")
 
+        let idRapport = 0
 
-            let idRapport = 0
+        //création d'un nouveau rapport
+        try {
 
-            console.log("Création d'un nouveau rapport")
+            const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
+                date: new Date(),
+                id_user: user.userlig.id,
+                zone: zone
 
-            console.log(items)
-            console.log(newItems)
+            });
 
-            // setLoading(true)
+            console.log('Réponse du serveur:', response.data);
 
+            idRapport = response.data.insertedRows.insertId
+            console.log("numero nouveau rapport : " + idRapport)
 
+        } catch (error) {
 
-            //création d'un nouveau rapport
-            try {
-                const response = await axios.post('http://localhost:3002/api/nouveaurapport', {
-                    date: new Date(),
-                    id_user: user.userlig.id,
-                    zone: zone
-                });
+            console.error('Erreur lors de l\'envoi des données:', error);
 
-                console.log('Réponse du serveur:', response.data);
+        }
 
-                idRapport = response.data.data.insertId
+        let data1 = []
 
-            } catch (error) {
-                console.error('Erreur lors de l\'envoi des données:', error);
+        items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
+
+        try {
+            const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
+            // alert(response.data.message); // Afficher le message de confirmation
+        } catch (error) {
+            if (error.response) {
+                // Erreur provenant du serveur
+                console.error('Erreur du serveur :', error.response.data.message);
+                alert('Erreur : ' + error.response.data.message);
+            } else if (error.request) {
+                // Pas de réponse du serveur
+                console.error('Pas de réponse du serveur :', error.request);
+                alert('Erreur réseau : pas de réponse du serveur');
+            } else {
+                // Erreur lors de la configuration de la requête
+                console.error('Erreur dans la requête :', error.message);
+                alert('Une erreur est survenue : ' + error.message);
             }
+        }
 
+        // setLoading(false)
 
-
-            let data1 = []
-
-            items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
-
-            console.log(data1)
-
-            try {
-                const response = await axios.post('http://localhost:3002/api/insererElements', { data1 });
-                // alert(response.data.message); // Afficher le message de confirmation
-            } catch (error) {
-                if (error.response) {
-                    // Erreur provenant du serveur
-                    console.error('Erreur du serveur :', error.response.data.message);
-                    alert('Erreur : ' + error.response.data.message);
-                } else if (error.request) {
-                    // Pas de réponse du serveur
-                    console.error('Pas de réponse du serveur :', error.request);
-                    alert('Erreur réseau : pas de réponse du serveur');
-                } else {
-                    // Erreur lors de la configuration de la requête
-                    console.error('Erreur dans la requête :', error.message);
-                    alert('Une erreur est survenue : ' + error.message);
-                }
-            }
-
-            // setLoading(false)
-
-
-
-        
-        alert('Action confirmée !');
+        alert('Rapport Enové ! ');
 
         closeModal();
 
-        // Vous pouvez ajouter ici le code pour effectuer l'action
+        navigate('/Dashboard')
+
     };
 
     const modalStyles = {
@@ -150,7 +136,6 @@ const Formulaire = () => {
     useEffect(() => { // Récupération DB
         setLoading(true)
 
-        console.log(user.userlig.id)
 
         const fetchData = async () => {
             try {
@@ -165,45 +150,14 @@ const Formulaire = () => {
 
         fetchData();
 
-        console.log("montage composant")
 
 
 
     }, []);
 
-    const [firstItem, setfirstItem] = useState([])
-
-    // useEffect(() => { // Mise à jour state items+
-
-
-    //     if (newItems.length !== 0) {
-    //         console.log(JSON.stringify(newItems))
-    //     }
-
-    //     if (JSON.stringify(items) !== JSON.stringify(newItems)) {
-    //         if (newItems.length !== 0) {
-    //             console.log(JSON.stringify(newItems))
-    //             setItems(newItems)
-    //         }
-
-    //     }
-
-    //     console.log("changement Items")
-
-
-    // }, [newItems])
-
-    useEffect(() => {
-        console.log("rendu")
-
-
-    })
-
 
 
     const searchByName = (name) => {
-        console.log(items)
-        console.log(newItems)
         return newItems.find((item) => item.name === name);
     };
 
@@ -233,9 +187,7 @@ const Formulaire = () => {
 
     const handleWrite = (event) => {
         const nom = event.target.name
-        console.log(nom)
         const item = searchByName(nom)
-        console.log(item)
         item.description = event.target.value
     }
 

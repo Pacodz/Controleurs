@@ -88,6 +88,30 @@
   width: 100%;
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.logo {
+  max-width: 100%;
+  height: auto;
+  transition: all 0.3s ease; /* Smooth resizing */
+}
+
+@media (max-width: 768px) {
+  .logo {
+    width: 150px; /* Adjust size for smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    width: 100px; /* Further adjustment for very small screens */
+  }
+}
 
 
 

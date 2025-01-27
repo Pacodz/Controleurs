@@ -120,8 +120,9 @@ const Dashboard = () => {
   //Supprimer un rapport
   const handleDelete = (num) => {
     axios
-      .delete(`http://localhost:3002/delete/${num}`)
+      .delete(`http://localhost:3002/api/delete/${num}`)
       .then((response) => {
+        console.log(response)
         setData(data.filter((item) => item.Num !== num));        // Mise à jour locale
       })
       .catch((error) => console.error(error));
@@ -133,8 +134,9 @@ const Dashboard = () => {
       .get(`http://localhost:3002/api/rapport/${currentReport}`)
       .then((response) => {
 
+        console.log(response.data.rows)
 
-        setReportData(response.data.result);
+        setReportData(response.data.rows);
 
         setTimeout(() => {
 
@@ -269,9 +271,9 @@ const Dashboard = () => {
                     {reportData.map((item) => (
                       <tr key={item.élements}>
                         <td>{item.élements}</td>
-                        <td>{item.Conforme}</td>
+                        <td>{item.Conforme ===1 ?('RAS'):('Problème')}</td>
                         <td>{item.detail}</td>
-                        <td>{item.intervention}</td>
+                        <td>{item.intervention=== 1 ? ('Oui') : ('Non')}</td>
                       </tr>))}
                   </tbody>
 

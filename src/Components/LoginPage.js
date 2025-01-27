@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { useEffect } from 'react';
-
+import logo from '../Assets/EGSA LOGO.png'
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -26,6 +26,7 @@ function LoginPage() {
         setLoading(false);
       } catch (err) {
         setError('Erreur lors de la récupération des données');
+        console.log(err)
         setLoading(false);
       }
     };
@@ -39,7 +40,7 @@ function LoginPage() {
   };
 
   const getPassword = (name) => {
-    const user = searchByName(name) 
+    const user = searchByName(name)
     return user.password
   }
 
@@ -85,6 +86,13 @@ function LoginPage() {
       <Row className="w-100">
         <Col md={{ span: 6, offset: 3 }}>
           <Card>
+            <div className="logo-container">
+              <img
+                src={logo}
+                alt="Company Logo"
+                className="logo"
+              />
+            </div>
             <Card.Body>
               <h3 className="text-center mb-4">Connexion</h3>
               {error && <Alert variant="danger">{error}</Alert>}
