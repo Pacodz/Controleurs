@@ -5,6 +5,7 @@ import axios from 'axios';
 import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
 import { useLocation } from 'react-router-dom';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 
 
@@ -83,7 +84,7 @@ const Dashboard = () => {
       maxHeight: '90%',
       height: '90%',
       overflowY: 'auto',
-      overflowX: 'auto' 
+      overflowX: 'auto'
     },
     buttons: {
       marginTop: '20px',
@@ -197,113 +198,128 @@ const Dashboard = () => {
       <NavbarApp></NavbarApp>
 
 
+      <Container>
+        {loading ? (
+          <Spinner animation="border" />
+        ) : (
+          <>        <h1 className='my-2'>Liste des rapports</h1>
 
-      {loading ? (
-        <Spinner animation="border" />
-      ) : (
-        <>        <h1 className='my-2'>Liste des rapports</h1>
-
-          <Table responsive striped bordered hover>
-            <thead>
-              <tr>
-                <th>Num</th>
-                <th>Date</th>
-                <th>Heure</th>
-                <th>َAuteur</th>
-                <th>Zone</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{item.Num}</td>
-                  <td>{item.date.split("T")[0]}</td>
-                  <td>{item.date.split("T")[1].split(".")[0].slice(0, 5)}</td>
-                  <td>{item.nom} {item.prenom}</td>
-                  <td>{endroit(item.zone)}</td>
-                  <td>
-                    <Container>
-                      <Row>
-                        <Col>
-                          <Button variant="primary" className='btn-dashboard' onClick={() => openReport(item.Num)}>
-                            Consulter
-                          </Button>
-                        </Col>
-                        {/* <Col>
+            <Table responsive striped bordered hover>
+              <thead >
+                <tr>
+                  <th>Num</th>
+                  <th>Date</th>
+                  <th>Heure</th>
+                  <th>َAuteur</th>
+                  <th>Zone</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((item, index) => (
+                  <tr key={item.id}>
+                    <td>{item.Num}</td>
+                    <td>{item.date.split("T")[0]}</td>
+                    <td>{item.date.split("T")[1].split(".")[0].slice(0, 5)}</td>
+                    <td>{item.nom} {item.prenom}</td>
+                    <td>{endroit(item.zone)}</td>
+                    <td>
+                      <Container>
+                        <Row>
+                          <Col>
+                            <Button variant="primary" className='btn-dashboard' onClick={() => openReport(item.Num)}>
+                              Consulter
+                            </Button>
+                          </Col>
+                          {/* <Col>
                           <Button variant="dark" className='btn-dashboard' onClick={() => alert(`ID: ${item.Num}`)}>
                             Marquer comme lu
                           </Button>
                         </Col> */}
-                        <Col>
-                          <Button variant="danger" className='btn-dashboard' onClick={() => openModal(item.Num)}>
-                            Supprimer
-                          </Button>
-                        </Col>
+                          <Col>
+                            <Button variant="danger" className='btn-dashboard' onClick={() => openModal(item.Num)}>
+                              Supprimer
+                            </Button>
+                          </Col>
 
-                      </Row>
-                    </Container>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+                        </Row>
+                      </Container>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
 
 
-          {/* Modal */}
-          {isModalOpen && (
-            <div style={modalStyles.overlay}>
-              <div style={modalStyles.content}>
-                <h2>Confirmation</h2>
-                <p>Êtes-vous sûr de vouloir Supprimer ce rapport ?</p>
-                <div style={modalStyles.buttons}>
-                  <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
-                  <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
+            {/* Modal */}
+            {isModalOpen && (
+              <div style={modalStyles.overlay}>
+                <div style={modalStyles.content}>
+                  <h2>Confirmation</h2>
+                  <p>Êtes-vous sûr de vouloir Supprimer ce rapport ?</p>
+                  <div style={modalStyles.buttons}>
+                    <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
+                    <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Rapport */}
-          {(isReportOpen && reportData) && (
-            <div style={modalStyles.overlay}>
-              <div style={modalStyles.content2}>
-                <h2>Rapport</h2>
-                <Table responsive striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Objets à controler</th>
-                      <th>Conforme ?	</th>
-                      <th>Observation ?  </th>
-                      <th>Intervention ?	</th>
-                    </tr>
-                  </thead>
+            {/* Rapport */}
+            {
+
+              (isReportOpen && reportData) && (
+
+                <Container>
+                  <div style={modalStyles.overlay}>
+                    <div style={modalStyles.content2}>
+                      <div className='d-flex'>
+                        <button className='ms-auto' onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
+                      </div>
+                      <h2>Rapport</h2>
+
+                      <Table responsive striped bordered hover>
+
+                        <thead style={{ verticalAlign: "middle", textAlign: "center" }}>
+                          <tr>
+                            <th style={{ width: '15%' }}>Objets à controler</th>
+                            <th style={{ width: '15%' }}>Conformité	</th>
+                            <th style={{ width: '55%', maxWidth: '55%' }}>Observation</th>
+                            <th style={{ width: '15%' }}>Intervention	</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {reportData.map((item) => (
+                            <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
+                              <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6>{item.élements}</h6></td>
+                              <td className={item.Conforme === 1 ? 'bg-success text-white' : 'bg-danger text-white'}><h6>{item.Conforme === 1 ? ('Conforme') : ('Non Conforme')}</h6></td>
+                              <td style={{
+                                maxWidth: "200px",
+                                wordWrap: "break-word",
+                                overflowWrap: "break-word",
+                                whiteSpace: "normal",
+                              }}>{item.detail}</td>
+                              <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i class="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} class="bi bi-x-square-fill"></i>}</td>
+                            </tr>))}
+                        </tbody>
+
+                      </Table>
+
+                      <div>
+                        <button onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
+                      </div>
+                    </div>
+
+                  </div>
+                </Container>
+              )}
 
 
-                  <tbody>
-                    {reportData.map((item) => (
-                      <tr key={item.élements}>
-                        <td>{item.élements}</td>
-                        <td>{item.Conforme ===1 ?('RAS'):('Problème')}</td>
-                        <td>{item.detail}</td>
-                        <td>{item.intervention=== 1 ? ('Oui') : ('Non')}</td>
-                      </tr>))}
-                  </tbody>
+          </>
+        )}
 
-
-                </Table>
-                <div style={modalStyles.buttons}>
-                  <button onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-
-        </>
-      )}
-
-
+      </Container>
 
     </>
   );

@@ -248,7 +248,7 @@ const Formulaire = () => {
 
             <Container>
 
-                <Row className='bg-light'> <h1 className='mt-4 text-primary'>Formulaire : {Endroit()} </h1> </Row>
+                <Row className='bg-light'> <h3 className='mt-4 '>Formulaire : {Endroit()} </h3> </Row>
 
                 <Col>
 
@@ -256,10 +256,10 @@ const Formulaire = () => {
                         <Table striped bordered hover responsive className='mt-3 '>
                             <thead className="table-dark">
                                 <tr>
-                                    <th>Objets à controler</th>
-                                    <th>Conforme ?	</th>
-                                    <th>Observation ?  </th>
-                                    <th>Intervention ?	</th>
+                                    <th style={{ width: '15%' }}>Objets à controler</th>
+                                    <th style={{ width: '15%' }}>Conforme ?	</th>
+                                    <th style={{ width: '55%' }}>Observation ?  </th>
+                                    <th style={{ width: '15%' }}>Intervention ?	</th>
                                 </tr>
                             </thead>
 
@@ -283,7 +283,6 @@ const Formulaire = () => {
                                                     onChange={handleWrite} />
                                             </td>
                                             <td>
-
                                                 <Form.Group>
                                                     <Form.Check
                                                         name={item.Nom}

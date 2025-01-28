@@ -15,9 +15,9 @@ function NavbarApp() {
 
       <Container>
 
-        <Navbar.Brand href="#home">   <Link className='td-btn' to='/welcome'>Retour à la page d'accueil       </Link></Navbar.Brand>
+        <Navbar.Brand href="#home">   <Link to='/welcome'> <i className="bi bi-house-door-fill" style={{ fontSize: '2rem', }}> </i>Accueil</Link></Navbar.Brand>
         <Link className='td-btn' to='/Dashboard'>Tableau de board       </Link>
-       
+
 
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
@@ -25,7 +25,7 @@ function NavbarApp() {
 
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">{user.userlig.nom+" "+user.userlig.prenom}</Nav.Link>
+            <Nav.Link href="#deets">{user.userlig.nom + " " + user.userlig.prenom}</Nav.Link>
             <Nav.Link eventKey={2} href="">
 
               {formattedDate}
