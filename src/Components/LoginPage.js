@@ -26,7 +26,6 @@ function LoginPage() {
         setLoading(false);
       } catch (err) {
         setError('Erreur lors de la récupération des données');
-        console.log(err)
         setLoading(false);
       }
     };
@@ -57,7 +56,6 @@ function LoginPage() {
       alert(`Connexion réussie pour : ${username}`);
       const userlig = searchByName(username)
       login(userlig, username)
-      console.log(username)
 
     } else {
       setError('Mot de passe Incorrect');

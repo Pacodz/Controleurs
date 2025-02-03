@@ -19,6 +19,8 @@ const Formulaire = () => {
     const [items, setItems] = useState([]); // Liste dynamique d'items
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loaded, setLoaded] = useState(false)
+    const [report, setReport] = useState('Nouveau Rapport créé !!');
+
 
     const openModal = () => {
         addItems()
@@ -30,6 +32,10 @@ const Formulaire = () => {
     };
 
     const handleConfirm = async () => {
+
+
+        const heure = `${new Date()}`
+        setReport('Nouveau rapport de monsieur' + user + 'envoyé à' + heure)
 
         let idRapport = 0
 
@@ -43,21 +49,20 @@ const Formulaire = () => {
 
             });
 
-            console.log('Réponse du serveur:', response.data);
 
             idRapport = response.data.insertedRows.insertId
-            console.log("numero nouveau rapport : " + idRapport)
 
-        } catch (error) {
-
-            console.error('Erreur lors de l\'envoi des données:', error);
-
-        }
+        } catch (error) { console.error('Erreur lors de l\'envoi des données:', error); }
 
         let data1 = []
+        let notConforme = []
 
         items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
+        items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, }))))
 
+
+
+        // insertion multipe
         try {
             const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 });
             // alert(response.data.message); // Afficher le message de confirmation
@@ -76,6 +81,34 @@ const Formulaire = () => {
                 alert('Une erreur est survenue : ' + error.message);
             }
         }
+
+        // envoie de mail
+        if (notConforme.length === 0) {
+            alert('Aucun problème signalé')
+        } else {
+            let problems = ''
+
+            notConforme.map((element) => {
+                problems = problems + element.name + ' : ' + element.description + '\n'
+
+            })
+
+
+            const emailData = {
+                to: 'lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz', // Remplacez par l'adresse e-mail du destinataire
+                subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
+                text: `Problème au niveau de la zone : ${Endroit} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
+            };
+
+            try {
+                const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
+                alert(response.data);
+            } catch (error) {
+                console.error('Error sending email:', error);
+            }
+
+        }
+
 
         // setLoading(false)
 
@@ -166,7 +199,7 @@ const Formulaire = () => {
     // Ajout d'un nouvel item
 
     const addItem = (item, description, intervention) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: true, description: description, intervention: intervention }; // Création d'un item unique
+        const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention }; // Création d'un item unique
         newItems.push(newItem)
 
     }

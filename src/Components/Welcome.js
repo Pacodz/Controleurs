@@ -13,7 +13,7 @@ const Welcome = () => {
     <Container>
 
 
-      <Row className='bg-light'> <h3 className='mt-4'> Choisir la zone à contrôler  </h3> </Row>
+      <Row className='bg-light'> <h3 className='mt-4'> Choisir une Zone  </h3> </Row>
 
 
       <Table striped responsive className="mt-3 ">

@@ -112,14 +112,12 @@ const Dashboard = () => {
 
   // Récupérer les données depuis l'API
   useEffect(() => {
-    console.log("salut")
 
     setLoading(true)
 
     axios
       .get(`https://egsa-constantine.dz/api/rapports?timestamp=${new Date().getTime()}`)
       .then((response) => {
-        console.log(response.data)
         setData(response.data);
         setLoading(false);
       })
@@ -136,7 +134,6 @@ const Dashboard = () => {
     axios
       .delete(`https://egsa-constantine.dz/api/delete/${num}`)
       .then((response) => {
-        console.log(response)
         setData(data.filter((item) => item.Num !== num));        // Mise à jour locale
       })
       .catch((error) => console.error(error));
@@ -148,7 +145,6 @@ const Dashboard = () => {
       .get(`https://egsa-constantine.dz/api/rapport/${currentReport}?timestamp=${new Date().getTime()}`)
       .then((response) => {
 
-        console.log(response.data.rows)
 
         setReportData(response.data.rows);
 
