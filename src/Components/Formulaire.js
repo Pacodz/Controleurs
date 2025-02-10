@@ -5,6 +5,8 @@ import axios from 'axios';
 import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 const Formulaire = () => {
 
@@ -20,6 +22,11 @@ const Formulaire = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loaded, setLoaded] = useState(false)
     const [report, setReport] = useState('Nouveau Rapport créé !!');
+
+    const [photo, setPhoto] = useState(null);
+    const [preview, setPreview] = useState(null);
+
+
 
 
     const openModal = () => {
@@ -57,8 +64,8 @@ const Formulaire = () => {
         let data1 = []
         let notConforme = []
 
-        items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport])))
-        items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, }))))
+        items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport, item.photo])))
+        items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, photo: item.photo }))))
 
 
 
@@ -95,11 +102,12 @@ const Formulaire = () => {
 
 
             const emailData = {
-                to: 'lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz', // Remplacez par l'adresse e-mail du destinataire
+                to: "lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz", // Remplacez par l'adresse e-mail du destinataire
                 subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
-                text: `Problème au niveau de la zone : ${Endroit} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
+                text: `Problème au niveau de la zone : ${Endroit()} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
             };
 
+            console.log(emailData)
             try {
                 const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
                 alert(response.data);
@@ -190,18 +198,15 @@ const Formulaire = () => {
 
 
 
-    const searchByName = (name) => {
-        return newItems.find((item) => item.name === name);
-    };
+    const searchByName = (name) => { return newItems.find((item) => item.name === name); };
 
 
 
     // Ajout d'un nouvel item
 
-    const addItem = (item, description, intervention) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention }; // Création d'un item unique
+    const addItem = (item, description, intervention, photo) => {
+        const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention, photo: photo }; // Création d'un item unique
         newItems.push(newItem)
-
     }
 
     const addItems = () => {
@@ -222,6 +227,8 @@ const Formulaire = () => {
         const nom = event.target.name
         const item = searchByName(nom)
         item.description = event.target.value
+        console.log(event.target.name)
+
     }
 
 
@@ -233,6 +240,27 @@ const Formulaire = () => {
         item.intervention = event.target.value === 'false' ? !event.target.checked : event.target.checked
 
     };
+
+    const handlePicture = (event) => {
+        const nom = event.target.name
+        const item = searchByName(nom)
+        item.photo = event.target.files[0];
+        console.log(event.target.files[0])
+        if (item.photo) {
+            setPhoto(item.photo);
+            setPreview(URL.createObjectURL(item.photo));
+        }
+    }
+
+
+    const handleTakePhoto = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            setPhoto(file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
 
     function Endroit() {
 
@@ -291,8 +319,10 @@ const Formulaire = () => {
                                 <tr>
                                     <th style={{ width: '15%' }}>Objets à controler</th>
                                     <th style={{ width: '15%' }}>Conforme ?	</th>
-                                    <th style={{ width: '55%' }}>Observation ?  </th>
-                                    <th style={{ width: '15%' }}>Intervention ?	</th>
+                                    <th style={{ width: '40%' }}>Observation ?  </th>
+                                    <th style={{ width: '10%' }}>Intervention ?	</th>
+                                    <th style={{ width: '20%' }}>Photo</th>
+
                                 </tr>
                             </thead>
 
@@ -313,6 +343,7 @@ const Formulaire = () => {
                                             <td>
                                                 <Form.Control as='textarea' rows={3} placeholder="Décrire le problème "
                                                     name={item.Nom}
+                                                    style={{ height: '100%', width: '100%' }}
                                                     onChange={handleWrite} />
                                             </td>
                                             <td>
@@ -333,9 +364,48 @@ const Formulaire = () => {
                                                     />
                                                 </Form.Group>
                                             </td>
+                                            <td>
+                                                <Col>
+
+                                                    <div >
+                                                        {/* Input masqué */}
+                                                        <input
+                                                            name={item.Nom}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            capture="environment"
+                                                            onChange={handlePicture}
+                                                            id="cameraInput"
+                                                            style={{ display: 'none' }}
+                                                        />
+                                                        {/* Label stylisé avec l'icône */}
+                                                        <label
+                                                            htmlFor="cameraInput"
+                                                            style={{
+                                                                maxWidth: '50%',
+                                                                display: 'inline-block',
+                                                                color: '#007bff',
+                                                                borderRadius: '15%',
+                                                                cursor: 'pointer',
+                                                                fontSize: '24px',
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon icon={faCamera} />
+                                                        </label>
+                                                    </div>
+                                                </Col>
+
+                                                <Col>
+                                                    {preview && <img src={preview} alt="Preview" style={{
+                                                        display: 'inline-block',
+                                                        maxWidth: '40%',
+                                                        maxHeight: '100px', marginTop: '20px'
+                                                    }} />}
+                                                </Col>
+                                            </td>
 
                                             {
-                                                addItem(item, '', false)
+                                                addItem(item, '', false, '')
                                             }
                                         </tr>
                                     )
@@ -377,6 +447,7 @@ const Formulaire = () => {
                     </div>
                 )
             }
+
 
         </>
 

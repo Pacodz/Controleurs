@@ -13,6 +13,8 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 const Dashboard = () => {
   const [data, setData] = useState([]);
 
+  const { user, login, logout } = useAuth();
+
   const [reportData, setReportData] = useState([])
 
   const [loading, setLoading] = useState(true);
@@ -113,6 +115,7 @@ const Dashboard = () => {
   // Récupérer les données depuis l'API
   useEffect(() => {
 
+    console.log(user.userlig)
     setLoading(true)
 
     axios
@@ -232,11 +235,13 @@ const Dashboard = () => {
                             Marquer comme lu
                           </Button>
                         </Col> */}
-                          <Col>
-                            <Button variant="danger" className='btn-dashboard' onClick={() => openModal(item.Num)}>
+
+                          {user.userlig.user_group == 2 &&
+                            <Col>  <Button variant="danger" className='btn-dashboard' onClick={() => openModal(item.Num)}>
                               Supprimer
                             </Button>
-                          </Col>
+                            </Col>
+                          }
 
                         </Row>
                       </Container>
@@ -262,8 +267,8 @@ const Dashboard = () => {
             )}
 
             {/* Rapport */}
-            {
 
+            {
               (isReportOpen && reportData) && (
 
                 <Container>
@@ -309,7 +314,8 @@ const Dashboard = () => {
 
                   </div>
                 </Container>
-              )}
+              )
+            }
 
 
           </>
