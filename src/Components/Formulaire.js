@@ -1,12 +1,13 @@
 import React from 'react'
 import { Button, Table, Form, Container, Col, Row, Alert } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import Previsualisation from './Previsualisation';
 
 const Formulaire = () => {
 
@@ -24,7 +25,8 @@ const Formulaire = () => {
     const [report, setReport] = useState('Nouveau Rapport créé !!');
 
     const [photo, setPhoto] = useState(null);
-    const [preview, setPreview] = useState(null);
+    const [preview, setPreview] = useState([]);
+    const previews = useRef([]);
 
 
 
@@ -175,6 +177,8 @@ const Formulaire = () => {
 
 
     useEffect(() => { // Récupération DB
+        console.log(previews)
+
         setLoading(true)
 
 
@@ -198,6 +202,7 @@ const Formulaire = () => {
 
 
 
+
     const searchByName = (name) => { return newItems.find((item) => item.name === name); };
 
 
@@ -207,6 +212,11 @@ const Formulaire = () => {
     const addItem = (item, description, intervention, photo) => {
         const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention, photo: photo }; // Création d'un item unique
         newItems.push(newItem)
+        const newPhoto = { id: item.id, photo: photo }
+        if (previews.current.length < newItems.length) {
+            previews.current.push(newPhoto)
+        }
+
     }
 
     const addItems = () => {
@@ -242,16 +252,37 @@ const Formulaire = () => {
     };
 
     const handlePicture = (event) => {
+
         const nom = event.target.name
-        const item = searchByName(nom)
-        item.photo = event.target.files[0];
-        console.log(event.target.files[0])
-        if (item.photo) {
-            setPhoto(item.photo);
-            setPreview(URL.createObjectURL(item.photo));
+        const itemi = searchByName(nom)
+
+        itemi.photo = event.target.files[0];
+        if (itemi.photo) {
+
+            const prev = previews.current.find((preview) => preview.id === itemi.id)
+
+            prev ? (prev.photo = URL.createObjectURL(itemi.photo)) : (console.log('nene'))
+
+            console.log(previews.current);
+            setPreview(previews.current);
         }
+
+
+
     }
 
+
+    const cherche = (id) => {
+        console.log('id recheerché : ' + id)
+        if (previews.current) {
+            const itm = previews.current.find((preview) => preview.id === id)
+            if (itm) {
+                console.log(itm)
+                return itm.photo
+            } else { return '' }
+        }
+
+    }
 
     const handleTakePhoto = (event) => {
         const file = event.target.files[0];
@@ -375,16 +406,17 @@ const Formulaire = () => {
                                                             accept="image/*"
                                                             capture="environment"
                                                             onChange={handlePicture}
-                                                            id="cameraInput"
+                                                            id={`cameraInput ${item.id}`}
                                                             style={{ display: 'none' }}
                                                         />
                                                         {/* Label stylisé avec l'icône */}
                                                         <label
-                                                            htmlFor="cameraInput"
+                                                            htmlFor={`cameraInput ${item.id}`}
                                                             style={{
                                                                 maxWidth: '50%',
                                                                 display: 'inline-block',
                                                                 color: '#007bff',
+
                                                                 borderRadius: '15%',
                                                                 cursor: 'pointer',
                                                                 fontSize: '24px',
@@ -396,11 +428,7 @@ const Formulaire = () => {
                                                 </Col>
 
                                                 <Col>
-                                                    {preview && <img src={preview} alt="Preview" style={{
-                                                        display: 'inline-block',
-                                                        maxWidth: '40%',
-                                                        maxHeight: '100px', marginTop: '20px'
-                                                    }} />}
+                                                    {cherche(item.id) !== '' && <Previsualisation id={item.id} images={previews} />}
                                                 </Col>
                                             </td>
 
@@ -440,6 +468,7 @@ const Formulaire = () => {
 
                             <div style={modalStyles.buttons}>
                                 <button onClick={handleConfirm} style={modalStyles.confirmButton}>Oui</button>
+
                                 <button onClick={closeModal} style={modalStyles.cancelButton}>Annuler</button>
                             </div>
                         </div>
