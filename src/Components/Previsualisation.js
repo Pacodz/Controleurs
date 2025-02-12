@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react'
 
 const Previsualisation = (props) => {
 
-    const [images, setImages] = useState('')
-    const [id, setId] = useState(props.id)
+    const [maPrevisualisation, setmaPrevisualisation] = useState('')
+
+
 
     useEffect(() => {
-        setId(props.id)
-        console.log("zebi")
+       
+        const photo = props.images.current.find((photo) => (photo.id === props.id))
+        setmaPrevisualisation(photo)
+        /*     const image = props.images.find((preview) => (preview.id = props.id))
+            console.log(image) */
 
-
-    }, [props])
+    }, [])
 
 
     return (
-        <img src={id} alt="Preview" style={{
+        <img src={maPrevisualisation.photo} alt="Preview" style={{
             display: 'inline-block',
             maxWidth: '40%',
             maxHeight: '100px', marginTop: '20px'

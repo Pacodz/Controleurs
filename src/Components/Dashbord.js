@@ -301,7 +301,7 @@ const Dashboard = () => {
                                 overflowWrap: "break-word",
                                 whiteSpace: "normal",
                               }}>{item.detail}</td>
-                              <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i class="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} class="bi bi-x-square-fill"></i>}</td>
+                              <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i className="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} className="bi bi-x-square-fill"></i>}</td>
                             </tr>))}
                         </tbody>
 

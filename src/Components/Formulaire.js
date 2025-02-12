@@ -18,15 +18,17 @@ const Formulaire = () => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const newItems = [];
+    const [newItems, setNewItems] = useState([])
     const [items, setItems] = useState([]); // Liste dynamique d'items
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loaded, setLoaded] = useState(false)
     const [report, setReport] = useState('Nouveau Rapport créé !!');
+    const [condItem, setCondItem] = useState(true)
 
     const [photo, setPhoto] = useState(null);
     const [preview, setPreview] = useState([]);
     const previews = useRef([]);
+    const [forceRender, setForceRender] = useState(false);
 
 
 
@@ -66,6 +68,8 @@ const Formulaire = () => {
         let data1 = []
         let notConforme = []
 
+        console.log(items)
+
         items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport, item.photo])))
         items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, photo: item.photo }))))
 
@@ -73,6 +77,7 @@ const Formulaire = () => {
 
         // insertion multipe
         try {
+            console.log(data1)
             const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 });
             // alert(response.data.message); // Afficher le message de confirmation
         } catch (error) {
@@ -92,32 +97,31 @@ const Formulaire = () => {
         }
 
         // envoie de mail
-        if (notConforme.length === 0) {
-            alert('Aucun problème signalé')
-        } else {
-            let problems = ''
-
-            notConforme.map((element) => {
-                problems = problems + element.name + ' : ' + element.description + '\n'
-
-            })
-
-
-            const emailData = {
-                to: "lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz", // Remplacez par l'adresse e-mail du destinataire
-                subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
-                text: `Problème au niveau de la zone : ${Endroit()} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
-            };
-
-            console.log(emailData)
-            try {
-                const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
-                alert(response.data);
-            } catch (error) {
-                console.error('Error sending email:', error);
-            }
-
-        }
+        /*  if (notConforme.length === 0) {
+             alert('Aucun problème signalé')
+         } else {
+             let problems = ''
+ 
+             notConforme.map((element) => {
+                 problems = problems + element.name + ' : ' + element.description + '\n'
+ 
+             })
+ 
+ 
+             const emailData = {
+                 to: "lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz", // Remplacez par l'adresse e-mail du destinataire
+                 subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
+                 text: `Problème au niveau de la zone : ${Endroit()} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
+             };
+ 
+             try {
+                 const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
+                 alert(response.data);
+             } catch (error) {
+                 console.error('Error sending email:', error);
+             }
+ 
+         } */
 
 
         // setLoading(false)
@@ -177,7 +181,6 @@ const Formulaire = () => {
 
 
     useEffect(() => { // Récupération DB
-        console.log(previews)
 
         setLoading(true)
 
@@ -209,13 +212,27 @@ const Formulaire = () => {
 
     // Ajout d'un nouvel item
 
-    const addItem = (item, description, intervention, photo) => {
-        const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention, photo: photo }; // Création d'un item unique
-        newItems.push(newItem)
+    const addItem = (conditionExecution, item, description, intervention, photo) => {
+
+
+        if (conditionExecution) {
+            const newItem = { id: item.id, name: item.Nom, conforme: false, description: description, intervention: intervention, photo: photo }; // Création d'un item unique
+            setNewItems((prevItems) => [...prevItems, newItem])
+
+
+
+
+
+        }
+
         const newPhoto = { id: item.id, photo: photo }
         if (previews.current.length < newItems.length) {
+            console.log("test")
             previews.current.push(newPhoto)
         }
+
+
+
 
     }
 
@@ -237,7 +254,6 @@ const Formulaire = () => {
         const nom = event.target.name
         const item = searchByName(nom)
         item.description = event.target.value
-        console.log(event.target.name)
 
     }
 
@@ -257,14 +273,17 @@ const Formulaire = () => {
         const itemi = searchByName(nom)
 
         itemi.photo = event.target.files[0];
+        console.log(itemi.photo)
+        console.log(previews.current)
         if (itemi.photo) {
 
             const prev = previews.current.find((preview) => preview.id === itemi.id)
 
             prev ? (prev.photo = URL.createObjectURL(itemi.photo)) : (console.log('nene'))
 
-            console.log(previews.current);
             setPreview(previews.current);
+            setForceRender((prev) => !prev);
+
         }
 
 
@@ -273,11 +292,9 @@ const Formulaire = () => {
 
 
     const cherche = (id) => {
-        console.log('id recheerché : ' + id)
         if (previews.current) {
             const itm = previews.current.find((preview) => preview.id === id)
             if (itm) {
-                console.log(itm)
                 return itm.photo
             } else { return '' }
         }
@@ -433,12 +450,15 @@ const Formulaire = () => {
                                             </td>
 
                                             {
-                                                addItem(item, '', false, '')
+                                                addItem(condItem, item, '', false, '')
                                             }
                                         </tr>
+
                                     )
-                                ))}
+                                ))
+                                }
                             </tbody>
+                            {condItem && setCondItem(false)}
                         </Table>
                     </Row>
                     <Row>
