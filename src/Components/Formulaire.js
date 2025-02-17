@@ -233,9 +233,6 @@ const Formulaire = () => {
             setNewItems((prevItems) => [...prevItems, newItem])
 
 
-
-
-
         }
 
         const newPhoto = { id: item.id, photo: photo }
@@ -308,7 +305,6 @@ const Formulaire = () => {
             itemi.photo = new Uint8Array(arrayBuffer).toString();
             console.log(new Uint8Array(arrayBuffer))
 
-            console.log(itemi.photo)
             const filetest = JSON.parse("[" + itemi.photo + "]")
             const restoredUint8Array = new Uint8Array(filetest);
             console.log(restoredUint8Array);

@@ -1,13 +1,18 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Table } from 'react-bootstrap'
 import axios from 'axios'
+
+
 
 
 const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIsReportOpen }) => {
 
     const [reportData, setReportData] = useState([])
     const [loading, setLoading] = useState(true);
+    const [photos, setPhotos] = useState([])
+    const previews = useRef([]);
+
 
     useEffect(() => {
         setLoading(true)
@@ -33,23 +38,64 @@ const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIs
 
             });
 
+        reportData.map((lig) => {
+            console.log(lig.photo)
+            setPhotos([...photos, lig.photo])
+            console.log(photos)
+        })
+
         setIsReportOpen(true)
     }, [])
 
+
+    useEffect(() => {
+
+
+
+        console.log(photos)
+
+    }, [photos])
+
+    useEffect(() => {
+
+        reportData.map((lig) => {
+            if (lig.photo == '') {
+                console.log('pas de photo')
+                previews.current.push({ photo: '', url: '' })
+
+
+            } else {
+
+                previews.current.push(stringToUnitArray(lig.photo, `photo ${new Date().getTime()}.jpg`, "image/png"))
+            }
+
+            console.log(previews.current)
+
+        })
+
+        setPhotos(previews.current)
+        console.log(previews.current)
+
+    }, [reportData])
+
+
+
+
+
     const stringToUnitArray = (text, fileName, mimeType) => {
         console.log("j'y suis")
-        const parsedArray = JSON.parse(text);  // Convertir le string en tableau
+        const parsedArray = JSON.parse('[' + text + ']');  // Convertir le string en tableau
         const restoredUint8Array = new Uint8Array(parsedArray);
-
+        console.log(restoredUint8Array)
         const file = uint8ArrayToFile(restoredUint8Array, fileName, mimeType)
         console.log(URL.createObjectURL(file))
-        return URL.createObjectURL(file)
+        return { photo: file, url: URL.createObjectURL(file) }
 
     }
 
     function uint8ArrayToFile(uint8Array, fileName, mimeType) {
-        let blob = new Blob([uint8Array], { type: mimeType });
-        let file = new File([blob], fileName, { type: mimeType });
+        const blob = new Blob([uint8Array], { type: mimeType });
+        const file = new File([blob], fileName, { type: mimeType });
         return file;
     }
 
@@ -75,7 +121,7 @@ const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIs
                 </thead>
 
                 <tbody>
-                    {reportData.map((item) => (
+                    {reportData.map((item, index) => (
                         <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6>{item.élements}</h6></td>
                             <td className={item.Conforme === 1 ? 'bg-success text-white' : 'bg-danger text-white'}><h6>{item.Conforme === 1 ? ('Conforme') : ('Non Conforme')}</h6></td>
@@ -90,7 +136,7 @@ const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIs
                             {/* <td>
                                 {item.photo && item.photo.data && item.photo.data.length}
                             </td> */}
-                            <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6> <img src={() => stringToUnitArray(item.photo, "photo", "image/jpg")} alt="Preview" style={{
+                            <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6> <img src={previews.current[index] && previews.current[index].url} alt="Preview" style={{
                                 display: 'inline-block',
                                 maxWidth: '40%',
                                 maxHeight: '100px', marginTop: '20px'
