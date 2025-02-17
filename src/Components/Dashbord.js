@@ -6,6 +6,7 @@ import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
 import { useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import ConsulterRapport from './ConsulterRapport';
 
 
 
@@ -23,6 +24,8 @@ const Dashboard = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
 
   const [currentReport, setCurrentReport] = useState('')
+
+  const [maPrevisualisation, setMaPrevisualisation] = useState('')
 
   const handleConfirm = (params) => {
     handleDelete(currentReport)
@@ -47,6 +50,12 @@ const Dashboard = () => {
   const openModal = (i) => {
     setCurrentReport(i)
     setIsModalOpen(true)
+  }
+
+  function uint8ArrayToFile(uint8Array, fileName, mimeType) {
+    let blob = new Blob([uint8Array], { type: mimeType });
+    let file = new File([blob], fileName, { type: mimeType });
+    return file;
   }
 
 
@@ -115,12 +124,12 @@ const Dashboard = () => {
   // Récupérer les données depuis l'API
   useEffect(() => {
 
-    console.log(user.userlig)
     setLoading(true)
 
     axios
       .get(`https://egsa-constantine.dz/api/rapports?timestamp=${new Date().getTime()}`)
       .then((response) => {
+
         setData(response.data);
         setLoading(false);
       })
@@ -128,6 +137,7 @@ const Dashboard = () => {
         console.error("Erreur lors de la récupération des données :", error);
         setLoading(false);
       });
+
   }, []);
 
 
@@ -144,21 +154,22 @@ const Dashboard = () => {
 
   const handleConsult = (currentReport) => {
 
-    axios
-      .get(`https://egsa-constantine.dz/api/rapport/${currentReport}?timestamp=${new Date().getTime()}`)
-      .then((response) => {
+    // axios
+    //   .get(`https://egsa-constantine.dz/api/rapport/${currentReport}?timestamp=${new Date().getTime()}`)
+    //   .then((response) => {
 
+    //     console.log(response.data.rows[0].photo.data)
 
-        setReportData(response.data.rows);
+    //     setReportData(response.data.rows);
 
-        setTimeout(() => {
+    //     setTimeout(() => {
 
-        }, 5000);
+    //     }, 2000);
 
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération des données :", error);
-      });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Erreur lors de la récupération des données :", error);
+    //   });
 
     setIsReportOpen(true)
 
@@ -272,40 +283,14 @@ const Dashboard = () => {
               (isReportOpen && reportData) && (
 
                 <Container>
+
                   <div style={modalStyles.overlay}>
                     <div style={modalStyles.content2}>
                       <div className='d-flex'>
                         <button className='ms-auto' onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
                       </div>
-                      <h2>Rapport</h2>
 
-                      <Table responsive striped bordered hover>
-
-                        <thead style={{ verticalAlign: "middle", textAlign: "center" }}>
-                          <tr>
-                            <th style={{ width: '15%' }}>Objets à controler</th>
-                            <th style={{ width: '15%' }}>Conformité	</th>
-                            <th style={{ width: '55%', maxWidth: '55%' }}>Observation</th>
-                            <th style={{ width: '15%' }}>Intervention	</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          {reportData.map((item) => (
-                            <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
-                              <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6>{item.élements}</h6></td>
-                              <td className={item.Conforme === 1 ? 'bg-success text-white' : 'bg-danger text-white'}><h6>{item.Conforme === 1 ? ('Conforme') : ('Non Conforme')}</h6></td>
-                              <td style={{
-                                maxWidth: "200px",
-                                wordWrap: "break-word",
-                                overflowWrap: "break-word",
-                                whiteSpace: "normal",
-                              }}>{item.detail}</td>
-                              <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i className="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} className="bi bi-x-square-fill"></i>}</td>
-                            </tr>))}
-                        </tbody>
-
-                      </Table>
+                      <ConsulterRapport currentReport={currentReport} setCurrentReport={setCurrentReport} isReportOpen={isReportOpen} setIsReportOpen={setIsReportOpen}></ConsulterRapport>
 
                       <div>
                         <button onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>

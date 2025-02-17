@@ -30,6 +30,15 @@ const Formulaire = () => {
     const previews = useRef([]);
     const [forceRender, setForceRender] = useState(false);
 
+    const [fileUint8Array, setFileUint8Array] = useState(null)
+
+    useEffect(() => {
+
+        setForceRender((prev) => !prev);
+
+    }, [fileUint8Array])
+
+
 
 
 
@@ -73,12 +82,16 @@ const Formulaire = () => {
         items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport, item.photo])))
         items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, photo: item.photo }))))
 
-
+        console.log(data1)
 
         // insertion multipe
         try {
             console.log(data1)
-            const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 });
+            const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 }, {
+
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            });
             // alert(response.data.message); // Afficher le message de confirmation
         } catch (error) {
             if (error.response) {
@@ -226,6 +239,7 @@ const Formulaire = () => {
         }
 
         const newPhoto = { id: item.id, photo: photo }
+
         if (previews.current.length < newItems.length) {
             console.log("test")
             previews.current.push(newPhoto)
@@ -267,19 +281,59 @@ const Formulaire = () => {
 
     };
 
+    function uint8ArrayToFile(uint8Array, fileName, mimeType) {
+        let blob = new Blob([uint8Array], { type: mimeType });
+        let file = new File([blob], fileName, { type: mimeType });
+        return file;
+    }
+
     const handlePicture = (event) => {
 
         const nom = event.target.name
         const itemi = searchByName(nom)
 
-        itemi.photo = event.target.files[0];
-        console.log(itemi.photo)
-        console.log(previews.current)
-        if (itemi.photo) {
+        const photoFile = event.target.files[0]
+        
+        console.log(event.target.files[0])
+        // Variable globale pour stocker le Uint8Array
+        // fichier vers binaire
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            let arrayBuffer = e.target.result;  // Contenu binaire sous forme de ArrayBuffer
+
+            // Convertir en Uint8Array pour manipulation
+            setFileUint8Array(new Uint8Array(arrayBuffer))
+
+            itemi.photo = new Uint8Array(arrayBuffer).toString();
+            console.log(new Uint8Array(arrayBuffer))
+
+            console.log(itemi.photo)
+            const filetest = JSON.parse("[" + itemi.photo + "]")
+            const restoredUint8Array = new Uint8Array(filetest);
+            console.log(restoredUint8Array);
+
+        };
+
+
+        reader.readAsArrayBuffer(photoFile)
+
+
+
+
+
+        //bianire vers fichier
+
+
+
+
+
+
+        if (photoFile) {
 
             const prev = previews.current.find((preview) => preview.id === itemi.id)
 
-            prev ? (prev.photo = URL.createObjectURL(itemi.photo)) : (console.log('nene'))
+            prev ? (prev.photo = URL.createObjectURL(photoFile)) : (console.log('nene'))
 
             setPreview(previews.current);
             setForceRender((prev) => !prev);
@@ -365,10 +419,10 @@ const Formulaire = () => {
                         <Table striped bordered hover responsive className='mt-3 '>
                             <thead className="table-dark">
                                 <tr>
-                                    <th style={{ width: '15%' }}>Objets à controler</th>
-                                    <th style={{ width: '15%' }}>Conforme ?	</th>
-                                    <th style={{ width: '40%' }}>Observation ?  </th>
-                                    <th style={{ width: '10%' }}>Intervention ?	</th>
+                                    <th style={{ width: '15%' }}>Objet</th>
+                                    <th style={{ width: '15%' }}>Conforme 	</th>
+                                    <th style={{ width: '40%' }}>Observation   </th>
+                                    <th style={{ width: '10%' }}>Intervention 	</th>
                                     <th style={{ width: '20%' }}>Photo</th>
 
                                 </tr>
