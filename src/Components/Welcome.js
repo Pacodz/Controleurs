@@ -1,7 +1,6 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { Table, Container, Button, Row } from 'react-bootstrap'
-import { Route, Routes, Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import NavbarApp from './Navbar'
 
 const Welcome = () => {
@@ -13,7 +12,7 @@ const Welcome = () => {
     <Container>
 
 
-      <Row className=''> <h3 className='mt-4'> Choisir une Zone  </h3> </Row>
+      <Row className=''> <h3 className='mt-4'> Choix de la Zone de Contrôle </h3> </Row>
 
 
       <Table responsive className="mt-3 ">
@@ -53,6 +52,7 @@ const Welcome = () => {
         </tbody>
       </Table>
     </Container>
+    
   </>
   )
 }

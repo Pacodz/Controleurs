@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Card, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from './AuthContext';
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import axios from 'axios';
@@ -53,7 +53,6 @@ function LoginPage() {
     }
 
     if (password === getPassword(username)) {
-      alert(`Connexion réussie pour : ${username}`);
       const userlig = searchByName(username)
       login(userlig, username)
 
@@ -67,16 +66,15 @@ function LoginPage() {
 
     navigate("/welcome")
 
-    // alert(`Connexion réussie pour : ${username}`);
   };
 
   if (loading) {
-    return <p>Chargement des données...</p>;
-  }
+    return <>
+      <Spinner animation="border" />
+      <p>Chargement des données...</p>
+    </>
 
-  // if (error) {
-  //   return <p>{error}</p>;
-  // }
+  }
 
 
   return (

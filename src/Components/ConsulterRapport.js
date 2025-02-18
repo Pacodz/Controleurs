@@ -1,12 +1,12 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import { Container, Table } from 'react-bootstrap'
+import { Container, Table, Spinner } from 'react-bootstrap'
 import axios from 'axios'
 
 
 
 
-const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIsReportOpen }) => {
+const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
 
     const [reportData, setReportData] = useState([])
     const [loading, setLoading] = useState(true);
@@ -169,42 +169,52 @@ const ConsulterRapport = ({ currentReport, setCurrentReport, isReportOpen, setIs
     }
 
     if (loading) {
-        return <p>Chargement des données...</p>;
+        return <>
+            <Spinner animation="border" />
+            <p>Chargement des données...</p>        </>
     }
 
     return (
         <>
-            <h2>Rapport</h2>
+            <h2 className='mb-3'>Détail du Rapport</h2>
 
             <Table responsive striped bordered hover>
 
                 <thead style={{ verticalAlign: "middle", textAlign: "center" }}>
                     <tr>
-                        <th style={{ width: '10%' }}>Objets à controler</th>
+                        <th style={{ width: '10%' }}>A controler</th>
                         <th style={{ width: '10%' }}>Conformité	</th>
                         <th style={{ width: '55%', maxWidth: '55%' }}>Observation</th>
-                        <th style={{ width: '10%' }}>Intervention	</th>
-                        <th style={{ width: '20%' }}>Photo	</th>
+                        <th style={{ width: '10%' }}>Intervention</th>
+                        <th style={{ width: '20%' }}>Photo</th>
 
                     </tr>
                 </thead>
 
                 <tbody>
                     {reportData.map((item, index) => (
-                        <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
-                            <td style={{ verticalAlign: "middle", textAlign: "center" }}><h6>{item.élements}</h6></td>
-                            <td className={item.Conforme === 1 ? 'bg-success text-white' : 'bg-danger text-white'}><h6>{item.Conforme === 1 ? ('Conforme') : ('Non Conforme')}</h6></td>
+                    
+                    <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
+                         
+                            <td style={{ verticalAlign: "middle", textAlign: "center" }}>
+                                <h6>{item.élements}</h6>
+                            </td>
+
+                            <td className={item.Conforme === 1 ? 'bg-success text-white' : 'bg-danger text-white'}>
+                                <h6>{item.Conforme === 1 ? ('Conforme') : ('Non Conforme')}</h6>
+                            </td>
+
                             <td style={{
                                 maxWidth: "200px",
                                 wordWrap: "break-word",
                                 overflowWrap: "break-word",
                                 whiteSpace: "normal",
-                            }}>{item.detail}</td>
+                            }}>
+                                {item.detail}
+                            </td>
+
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i className="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} className="bi bi-x-square-fill"></i>}</td>
 
-                            {/* <td>
-                                {item.photo && item.photo.data && item.photo.data.length}
-                            </td> */}
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>
                                 <h6>
                                     {previews.current[index] && (previews.current[index].photo == '' || !previews.current[index].photo) ? (<p>Pas de photo</p>) : (<img onClick={handleAgrandir} src={previews.current[index] && previews.current[index].url} alt="Preview" style={{

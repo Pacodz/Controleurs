@@ -10,8 +10,7 @@ const Previsualisation = (props) => {
        
         const photo = props.images.current.find((photo) => (photo.id === props.id))
         setmaPrevisualisation(photo)
-        /*     const image = props.images.find((preview) => (preview.id = props.id))
-            console.log(image) */
+    
 
     }, [])
 

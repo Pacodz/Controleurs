@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Table, Form, Container, Col, Row, Alert } from 'react-bootstrap';
+import { Button, Table, Form, Container, Col, Row } from 'react-bootstrap';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import NavbarApp from './Navbar'
@@ -23,18 +23,10 @@ const Formulaire = () => {
     const [newItems, setNewItems] = useState([])
     const [items, setItems] = useState([]); // Liste dynamique d'items
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [loaded, setLoaded] = useState(false)
-    const [report, setReport] = useState('Nouveau Rapport créé !!');
     const [condItem, setCondItem] = useState(true)
 
-    const [photo, setPhoto] = useState(null);
-    const [preview, setPreview] = useState([]);
     const previews = useRef([]);
     const [forceRender, setForceRender] = useState(false);
-
-    const [compressedFile, setCompressedFile] = useState(null);
-    const [originalSize, setOriginalSize] = useState(0);
-    const [compressedSize, setCompressedSize] = useState(0);
 
 
     const [fileUint8Array, setFileUint8Array] = useState(null)
@@ -62,7 +54,6 @@ const Formulaire = () => {
 
 
         const heure = `${new Date()}`
-        setReport('Nouveau rapport de monsieur' + user + 'envoyé à' + heure)
 
         let idRapport = 0
 
@@ -114,31 +105,31 @@ const Formulaire = () => {
         }
 
         // envoie de mail
-        /*  if (notConforme.length === 0) {
-             alert('Aucun problème signalé')
-         } else {
-             let problems = ''
- 
-             notConforme.map((element) => {
-                 problems = problems + element.name + ' : ' + element.description + '\n'
- 
-             })
- 
- 
-             const emailData = {
-                 to: "lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz", // Remplacez par l'adresse e-mail du destinataire
-                 subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
-                 text: `Problème au niveau de la zone : ${Endroit()} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
-             };
- 
-             try {
-                 const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
-                 alert(response.data);
-             } catch (error) {
-                 console.error('Error sending email:', error);
-             }
- 
-         } */
+        if (notConforme.length === 0) {
+            alert('Aucun problème signalé')
+        } else {
+            let problems = ''
+
+            notConforme.map((element) => {
+                problems = problems + element.name + ' : ' + element.description + '\n'
+
+            })
+
+
+            const emailData = {
+                to: "lekikot.souheil@egsa-constantine.dz, benhafed.billel@egsa-constantine.dz", // Remplacez par l'adresse e-mail du destinataire
+                subject: 'Nouveau signalement de monsieur ' + user.userlig.nom + ' ' + user.userlig.prenom,
+                text: `Problème au niveau de la zone : ${Endroit()} \n ${problems} \n Redirigez vous vers  https://egsa-constantine.dz/controleurs pour consulter le rapport`
+            };
+
+            try {
+                const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
+                alert(response.data);
+            } catch (error) {
+                console.error('Error sending email:', error);
+            }
+
+        }
 
 
         // setLoading(false)
@@ -281,11 +272,11 @@ const Formulaire = () => {
 
     };
 
-    function uint8ArrayToFile(uint8Array, fileName, mimeType) {
-        let blob = new Blob([uint8Array], { type: mimeType });
-        let file = new File([blob], fileName, { type: mimeType });
-        return file;
-    }
+    // function uint8ArrayToFile(uint8Array, fileName, mimeType) {
+    //     let blob = new Blob([uint8Array], { type: mimeType });
+    //     let file = new File([blob], fileName, { type: mimeType });
+    //     return file;
+    // }
 
     const handlePicture = async (event) => {
 
@@ -354,7 +345,6 @@ const Formulaire = () => {
 
             prev ? (prev.photo = URL.createObjectURL(photoFile)) : (console.log('nene'))
 
-            setPreview(previews.current);
             setForceRender((prev) => !prev);
 
         }
@@ -373,15 +363,6 @@ const Formulaire = () => {
         }
 
     }
-
-    const handleTakePhoto = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            setPhoto(file);
-            setPreview(URL.createObjectURL(file));
-        }
-    };
-
 
     function Endroit() {
 

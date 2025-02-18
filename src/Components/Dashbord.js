@@ -1,10 +1,9 @@
 import React from 'react'
-import { Button, Table, Form, Container, Col, Row, Alert, Spinner } from 'react-bootstrap';
+import { Button, Table, Container, Col, Row, Spinner } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import NavbarApp from './Navbar'
 import { useAuth } from './AuthContext';
-import { useLocation } from 'react-router-dom';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import ConsulterRapport from './ConsulterRapport';
 
@@ -25,19 +24,17 @@ const Dashboard = () => {
 
   const [currentReport, setCurrentReport] = useState('')
 
-  const [maPrevisualisation, setMaPrevisualisation] = useState('')
-
-  const handleConfirm = (params) => {
+  const handleConfirm = () => {
     handleDelete(currentReport)
     setCurrentReport(0)
     setIsModalOpen(false)
   }
 
-  const closeModal = (params) => {
+  const closeModal = () => {
     setIsModalOpen(false)
   }
 
-  const closeReport = (params) => {
+  const closeReport = () => {
     setIsReportOpen(false)
   }
 
@@ -50,12 +47,6 @@ const Dashboard = () => {
   const openModal = (i) => {
     setCurrentReport(i)
     setIsModalOpen(true)
-  }
-
-  function uint8ArrayToFile(uint8Array, fileName, mimeType) {
-    let blob = new Blob([uint8Array], { type: mimeType });
-    let file = new File([blob], fileName, { type: mimeType });
-    return file;
   }
 
 
@@ -152,24 +143,7 @@ const Dashboard = () => {
       .catch((error) => console.error(error));
   }
 
-  const handleConsult = (currentReport) => {
-
-    // axios
-    //   .get(`https://egsa-constantine.dz/api/rapport/${currentReport}?timestamp=${new Date().getTime()}`)
-    //   .then((response) => {
-
-    //     console.log(response.data.rows[0].photo.data)
-
-    //     setReportData(response.data.rows);
-
-    //     setTimeout(() => {
-
-    //     }, 2000);
-
-    //   })
-    //   .catch((error) => {
-    //     console.error("Erreur lors de la récupération des données :", error);
-    //   });
+  const handleConsult = () => {
 
     setIsReportOpen(true)
 
@@ -180,22 +154,16 @@ const Dashboard = () => {
     switch (zone) {
       case 'A_I':
         return <p>Arrivée Internationale</p>;
-        break;
       case 'A_N':
         return <p>Arrivée Nationale</p>;
-        break;
       case 'D_I':
         return <p>Départ international</p>;
-        break;
       case 'D_N':
         return <p>Départ National</p>;
-        break;
       case 'H_P':
         return <p>Hall Publique</p>;
-        break;
       case 'ERG':
         return <p>Enregistrement</p>;
-        break;
 
       default:
         return <p>Statut inconnu.</p>;
@@ -212,7 +180,7 @@ const Dashboard = () => {
         {loading ? (
           <Spinner animation="border" />
         ) : (
-          <>        <h1 className='my-2'>Liste des rapports</h1>
+          <>        <h1 className='my-2'>Liste des Rapports</h1>
 
             <Table responsive striped bordered hover>
               <thead >
@@ -226,7 +194,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {data.map((item, index) => (
+                {data.map((item) => (
                   <tr key={item.id}>
                     <td>{item.Num}</td>
                     <td>{item.date.split("T")[0]}</td>
@@ -241,13 +209,8 @@ const Dashboard = () => {
                               Consulter
                             </Button>
                           </Col>
-                          {/* <Col>
-                          <Button variant="dark" className='btn-dashboard' onClick={() => alert(`ID: ${item.Num}`)}>
-                            Marquer comme lu
-                          </Button>
-                        </Col> */}
 
-                          {user.userlig.user_group == 2 &&
+                          {user.userlig.user_group === 2 &&
                             <Col>  <Button variant="danger" className='btn-dashboard' onClick={() => openModal(item.Num)}>
                               Supprimer
                             </Button>
@@ -290,7 +253,7 @@ const Dashboard = () => {
                         <button className='ms-auto' onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
                       </div>
 
-                      <ConsulterRapport currentReport={currentReport} setCurrentReport={setCurrentReport} isReportOpen={isReportOpen} setIsReportOpen={setIsReportOpen}></ConsulterRapport>
+                      <ConsulterRapport currentReport={currentReport} setIsReportOpen={setIsReportOpen}></ConsulterRapport>
 
                       <div>
                         <button onClick={closeReport} style={modalStyles.cancelButton}>Fermer</button>
