@@ -11,12 +11,17 @@ function NavbarApp() {
   const { user, login, logout } = useAuth();
 
   return (
-    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+    <Navbar bg="dark" data-bs-theme="dark" collapseOnSelect expand="lg" className="bg-body-tertiary" >
 
       <Container>
 
-        <Navbar.Brand href="#home">   <Link to='/welcome'> <i className="bi bi-house-door-fill" style={{ fontSize: '2rem', }}> </i>Accueil</Link></Navbar.Brand>
-        <Link className='td-btn' to='/Dashboard'>Tableau de board       </Link>
+        <Navbar.Brand>
+          <Link to='/welcome' > <i className="bi bi-house-door-fill text-light" style={{ fontSize: '1.5rem', }}> Accueil </i></Link>
+        </Navbar.Brand>
+
+        <Navbar.Brand>
+          <Link to='/Dashboard' > <i className="bi bi-info-square-fill text-light" style={{ fontSize: '1.5rem', }}> Tableau de board </i></Link>
+        </Navbar.Brand>
 
 
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -25,12 +30,12 @@ function NavbarApp() {
 
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">{user.userlig.nom + " " + user.userlig.prenom}</Nav.Link>
+            <Nav.Link href="#deets"><i style={{ fontSize: '1.5rem', }}>{user.userlig.nom + " " + user.userlig.prenom}</i></Nav.Link>
             <Nav.Link eventKey={2} href="">
-
-              {formattedDate}
+              <g style={{ fontSize: '1.5rem', }}>
+                {formattedDate}</g>
             </Nav.Link>
-            <Nav.Link onClick={logout} to='/Login' >Déconnexion</Nav.Link>
+            <Nav.Link onClick={logout} to='/Login' > <i className="bi bi-door-closed-fill text-light" style={{ fontSize: '1.5rem', }}> Déconnexion</i></Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

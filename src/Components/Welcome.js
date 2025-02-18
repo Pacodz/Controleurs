@@ -13,14 +13,11 @@ const Welcome = () => {
     <Container>
 
 
-      <Row className='bg-light'> <h3 className='mt-4'> Choisir une Zone  </h3> </Row>
+      <Row className=''> <h3 className='mt-4'> Choisir une Zone  </h3> </Row>
 
 
-      <Table striped responsive className="mt-3 ">
-        
-        <thead>
+      <Table responsive className="mt-3 ">
 
-        </thead>
 
         <tbody>
           <tr>

@@ -8,6 +8,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import Previsualisation from './Previsualisation';
+import imageCompression from "browser-image-compression";
+
 
 const Formulaire = () => {
 
@@ -29,6 +31,11 @@ const Formulaire = () => {
     const [preview, setPreview] = useState([]);
     const previews = useRef([]);
     const [forceRender, setForceRender] = useState(false);
+
+    const [compressedFile, setCompressedFile] = useState(null);
+    const [originalSize, setOriginalSize] = useState(0);
+    const [compressedSize, setCompressedSize] = useState(0);
+
 
     const [fileUint8Array, setFileUint8Array] = useState(null)
 
@@ -77,16 +84,13 @@ const Formulaire = () => {
         let data1 = []
         let notConforme = []
 
-        console.log(items)
 
         items.map((item) => (data1.push([item.conforme, item.description, item.id, item.intervention, idRapport, item.photo])))
         items.map((item) => (!item.conforme && (notConforme.push({ name: item.name, description: item.description, intervention: item.intervention, photo: item.photo }))))
 
-        console.log(data1)
 
         // insertion multipe
         try {
-            console.log(data1)
             const response = await axios.post('https://egsa-constantine.dz/api/insererElements', { data1 }, {
 
                 maxContentLength: Infinity,
@@ -238,7 +242,6 @@ const Formulaire = () => {
         const newPhoto = { id: item.id, photo: photo }
 
         if (previews.current.length < newItems.length) {
-            console.log("test")
             previews.current.push(newPhoto)
         }
 
@@ -284,16 +287,39 @@ const Formulaire = () => {
         return file;
     }
 
-    const handlePicture = (event) => {
+    const handlePicture = async (event) => {
 
         const nom = event.target.name
         const itemi = searchByName(nom)
 
         const photoFile = event.target.files[0]
-        
-        console.log(event.target.files[0])
+        let compressedImage = []
+        if (!photoFile) return;
+
+
+        console.log("taille originale : " + photoFile.size)
+
+        // Options de compression
+        const options = {
+            maxSizeMB: 0.1, // Taille max en MB
+            maxWidthOrHeight: 800, // Taille max en pixels
+            useWebWorker: true,
+        };
+
+        try {
+            compressedImage = await imageCompression(photoFile, options);
+
+            console.log("taille Compréssée : " + compressedImage.size)
+
+        } catch (error) {
+            console.error("Erreur lors de la compression:", error);
+        }
+
+
+
+
+
         // Variable globale pour stocker le Uint8Array
-        // fichier vers binaire
         const reader = new FileReader();
 
         reader.onload = function (e) {
@@ -303,16 +329,13 @@ const Formulaire = () => {
             setFileUint8Array(new Uint8Array(arrayBuffer))
 
             itemi.photo = new Uint8Array(arrayBuffer).toString();
-            console.log(new Uint8Array(arrayBuffer))
-
-            const filetest = JSON.parse("[" + itemi.photo + "]")
-            const restoredUint8Array = new Uint8Array(filetest);
-            console.log(restoredUint8Array);
 
         };
 
 
-        reader.readAsArrayBuffer(photoFile)
+        const CompressedFile = compressedImage
+
+        reader.readAsArrayBuffer(CompressedFile)
 
 
 
