@@ -53,7 +53,7 @@ const Formulaire = () => {
     const handleConfirm = async () => {
 
 
-        const heure = `${new Date()}`
+        closeModal();
 
         let idRapport = 0
 
@@ -124,7 +124,6 @@ const Formulaire = () => {
 
             try {
                 const response = await axios.post('https://egsa-constantine.dz/api/send-mail', emailData);
-                alert(response.data);
             } catch (error) {
                 console.error('Error sending email:', error);
             }
@@ -136,7 +135,6 @@ const Formulaire = () => {
 
         alert('Rapport Enové ! ');
 
-        closeModal();
 
         navigate('/Dashboard')
 

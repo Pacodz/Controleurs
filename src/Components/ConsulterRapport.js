@@ -2,7 +2,7 @@ import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 import { Container, Table, Spinner } from 'react-bootstrap'
 import axios from 'axios'
-
+import PrevisulisationDash from './PrevisulisationDash'
 
 
 
@@ -14,6 +14,9 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
     const [isPhotoAgrandi, setIsPhotoAgrandi] = useState(false)
     const previews = useRef([]);
     const [currentPhotoURL, setCurrentPhotoURL] = useState(null)
+    const [forceRerender, setForceRerender] = useState(true)
+
+
 
     useEffect(() => {
 
@@ -44,10 +47,32 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                 setLoading(false)
 
             });
+        reportData.map((lig) => {
+            if (reportData.length === previews.current.length) {
+            } else {
+
+                if (lig.photo === '') {
+                    console.log('pas de photo')
+                    previews.current.push({ photo: '', url: '' })
+
+
+                } else {
+                    previews.current.push(stringToUnitArray(lig.photo, `photo ${new Date().getTime()}.jpg`, "image/png"))
+                }
+
+            }
+
+        })
+
+        setPhotos(previews.current)
 
 
         setIsReportOpen(true)
 
+        return () => {
+            setForceRerender((prev) => !prev)
+
+        }
 
     }, [])
 
@@ -193,9 +218,9 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
 
                 <tbody>
                     {reportData.map((item, index) => (
-                    
-                    <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
-                         
+
+                        <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
+
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>
                                 <h6>{item.élements}</h6>
                             </td>
@@ -216,14 +241,12 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i className="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} className="bi bi-x-square-fill"></i>}</td>
 
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>
-                                <h6>
-                                    {previews.current[index] && (previews.current[index].photo == '' || !previews.current[index].photo) ? (<p>Pas de photo</p>) : (<img onClick={handleAgrandir} src={previews.current[index] && previews.current[index].url} alt="Preview" style={{
-                                        display: 'inline-block',
-                                        maxWidth: '40%',
-                                        maxHeight: '100px', marginTop: '20px'
-                                    }} />)}
 
-                                </h6>
+
+                                    <PrevisulisationDash preview={previews.current[index]} handleAgrandir={handleAgrandir}></PrevisulisationDash>
+
+
+
                             </td>
 
                         </tr>))}
@@ -241,7 +264,7 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                                 <div className='d-flex'>
                                     <button className='ms-auto' onClick={closePhotoAgrandi} style={modalStyles.cancelButton}>Fermer</button>
                                 </div>
-                                <img onClick={handleAgrandir} src={currentPhotoURL} alt="Preview" style={{
+                                <img onClick={handleAgrandir} src={currentPhotoURL} style={{
                                     display: 'inline-block',
                                     maxWidth: '100%',
                                     maxHeight: '100%', marginTop: '20px'
