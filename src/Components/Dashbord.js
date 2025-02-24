@@ -15,8 +15,6 @@ const Dashboard = () => {
 
   const { user, login, logout } = useAuth();
 
-  const [reportData, setReportData] = useState([])
-
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -243,7 +241,7 @@ const Dashboard = () => {
             {/* Rapport */}
 
             {
-              (isReportOpen && reportData) && (
+              (isReportOpen) && (
 
                 <Container>
 

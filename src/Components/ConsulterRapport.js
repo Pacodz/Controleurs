@@ -17,6 +17,12 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
     const [forceRerender, setForceRerender] = useState(true)
 
 
+    useEffect(() => {
+        console.log(previews.current)
+
+    }, [previews])
+
+
 
     useEffect(() => {
 
@@ -32,12 +38,8 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                     console.log("pas de réponse")
                 }
 
-                reportData.map((lig) => {
-                    setPhotos([...photos, lig.photo])
-                })
+             
 
-
-                setLoading(false)
 
 
 
@@ -47,32 +49,13 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                 setLoading(false)
 
             });
-        reportData.map((lig) => {
-            if (reportData.length === previews.current.length) {
-            } else {
-
-                if (lig.photo === '') {
-                    console.log('pas de photo')
-                    previews.current.push({ photo: '', url: '' })
 
 
-                } else {
-                    previews.current.push(stringToUnitArray(lig.photo, `photo ${new Date().getTime()}.jpg`, "image/png"))
-                }
-
-            }
-
-        })
 
         setPhotos(previews.current)
 
 
         setIsReportOpen(true)
-
-        return () => {
-            setForceRerender((prev) => !prev)
-
-        }
 
     }, [])
 
@@ -80,29 +63,40 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
 
     useEffect(() => {
 
+        console.log(reportData)
+
+        if (reportData.length > 0) {
+            reportData.map((lig) => {
+                if (reportData.length > previews.current.length) {
 
 
-        reportData.map((lig) => {
-            if (reportData.length === previews.current.length) {
-            } else {
+                    if (lig.photo === '') {
+                        console.log('pas de photo')
+                        previews.current.push({ photo: '', url: '' })
 
 
-                if (lig.photo === '') {
-                    console.log('pas de photo')
-                    previews.current.push({ photo: '', url: '' })
+                    } else {
+                        previews.current.push(stringToUnitArray(lig.photo, `photo ${new Date().getTime()}.jpg`, "image/png"))
+                    }
 
-
-                } else {
-                    previews.current.push(stringToUnitArray(lig.photo, `photo ${new Date().getTime()}.jpg`, "image/png"))
                 }
 
-            }
+
+
+            })
+
+            setPhotos(previews.current)
+
+            setLoading(false)
 
 
 
-        })
+        } else {
 
-        setPhotos(previews.current)
+            console.log("reportdata vide")
+        }
+
+
 
     }, [reportData])
 
@@ -219,6 +213,7 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                 <tbody>
                     {reportData.map((item, index) => (
 
+
                         <tr style={{ verticalAlign: "middle", textAlign: "center" }} key={item.élements}>
 
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>
@@ -241,9 +236,10 @@ const ConsulterRapport = ({ currentReport, setIsReportOpen }) => {
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>{item.intervention === 1 ? < i className="bi bi-check-square-fill" style={{ fontSize: '2rem', color: 'green' }}></i> : <i style={{ fontSize: '2rem', color: 'red' }} className="bi bi-x-square-fill"></i>}</td>
 
                             <td style={{ verticalAlign: "middle", textAlign: "center" }}>
-
-
-                                    <PrevisulisationDash preview={previews.current[index]} handleAgrandir={handleAgrandir}></PrevisulisationDash>
+                                {console.log(index)}
+                                {console.log(photos[index])}
+                                {photos[index] !== undefined ? (<PrevisulisationDash setForceRerender={setForceRerender} preview={previews.current[index]} handleAgrandir={handleAgrandir}></PrevisulisationDash>
+                                ) : (<p>loading parent</p>)}
 
 
 
